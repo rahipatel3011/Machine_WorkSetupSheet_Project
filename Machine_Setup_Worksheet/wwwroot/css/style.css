@@ -1,0 +1,49 @@
+.container {
+    
+}
+
+.centered-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 85vh; /* This makes the container take up the full height of the screen */
+}
+
+.searchbar{
+    width: 50%;
+}
+
+footer {
+    text-align: center;
+}
+
+
+/* Jaws Page */
+h1 {
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.table thead {
+    background-color: #343a40;
+    color: #fff;
+}
+
+# createButton {
+    height: fit-content;
+}
+
+.table tbody tr td {
+    vertical-align: middle;
+}
+
+.btn-sm {
+    font-size: 0.875rem;
+}
+.jaws-name{
+    width: 70%;
+}
+.jaws-action{
+    width: 25%;
+}
