@@ -1,12 +1,22 @@
-﻿@model IEnumerable<Jaw>;
+﻿@model IEnumerable<JawsDTO>;
 @{
     ViewBag.Title = "Jaws";
+    JawsDTO ViewBagJaw = new JawsDTO();
+    if(ViewBag.jaw != null)
+    {
+        ViewBagJaw = ViewBag.jaw;
+    }
+
 }
+
+
+
 
 <div class="w-75 mx-auto">
 <h1 class="my-4 text-center">Jaws Management</h1>
 <div class="d-flex justify-content-end mb-3">
-    <a asp-action="Create" asp-controller="Jaws" class="btn btn-primary" id="createButton">Create Jaw</a>
+    <a class="btn btn-primary" id="createButton" href="/jaws/create">Create Jaw</a>
+        @* asp-action="Create" asp-controller="Jaws" *@
 </div>
 
 <table class="table table-bordered">
@@ -18,17 +28,56 @@
     </thead>
     <tbody>
         <!-- Sample row -->
-        @foreach(Jaw jaw in Model){
+            @foreach (JawsDTO jaw in Model)
+            {
             <tr>
             <td>@jaw.JawName</td>
             <td>
-                <button class="btn btn-warning btn-sm me-2" href="#">Edit</button>
-                <button class="btn btn-danger btn-sm">Delete</button>
+                <a class="btn btn-warning btn-sm me-2" href="/jaws/edit/@jaw.JawId" id="updateButton">Edit</a>
+                <a class="btn btn-danger btn-sm" href="/jaws/delete/@jaw.JawId"  id="deleteButton">Delete</a>
             </td>
         </tr>
         }
-        
         <!-- Add more rows as needed -->
     </tbody>
 </table>
     </div>
+@{
+    string name = "efsdf";
+}
+    <!-- invoke ViewComponent -->
+@if(ViewBag.Delete == true)
+{
+    @await Component.InvokeAsync("Modal", new { Id = ViewBagJaw.JawId })
+    ;
+
+}else if(ViewBag.Open == true)
+{
+
+    @await Component.InvokeAsync("Modal", new { dtoObject = ViewBagJaw })
+    ;
+    
+}
+
+
+
+@section Script {
+    <script>
+
+        @if ((ViewBag.Errors != null && ViewBag.Open == true) || ViewBag.Open == true)
+        {
+            <text>
+                let myModal = new bootstrap.Modal(document.getElementById('createModal'));
+                myModal.show();
+            </text>
+        }
+        else if ((ViewBag.Errors != null && ViewBag.Delete == true) || ViewBag.Delete == true)
+        {
+            <text>
+                let deleteModal = new bootstrap.Modal(document.getElementById('DeleteModal'));
+                deleteModal.show();
+            </text>
+        }
+
+    </script>
+}

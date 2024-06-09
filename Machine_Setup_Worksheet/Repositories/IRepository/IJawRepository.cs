@@ -4,7 +4,11 @@ namespace Machine_Setup_Worksheet.Repositories.IRepository
 {
     public interface IJawRepository
     {
-        Task<IEnumerable<Jaw>> getAll();
-        Task<Jaw> getById(Guid? id);
+       
+        Task<IEnumerable<Jaw>> GetAll();
+        Task<Jaw> GetById(Guid id);
+        Task<Jaw> Create(Jaw jaw);
+        Task<Jaw> Update(Jaw jaw);
+        Task<int> Delete(Guid id);
     }
 }

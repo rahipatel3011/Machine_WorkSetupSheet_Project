@@ -14,12 +14,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // DI for all repository
 builder.Services.AddScoped<IJawRepository, JawRepository>();
+builder.Services.AddScoped<IMachineRepository, MachineRepository>();
 
 
 // DI for all services
 builder.Services.AddScoped<IJawService, JawService>();
+builder.Services.AddScoped<IMachineService, MachineService>();
 
-
+// AutoMapper
+builder.Services.AddAutoMapper(typeof(Program));
 
 var app = builder.Build();
 
