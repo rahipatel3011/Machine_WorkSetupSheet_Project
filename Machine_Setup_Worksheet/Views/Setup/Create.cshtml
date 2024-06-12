@@ -1,0 +1,133 @@
+﻿@model SetupDTO
+
+@{
+    ViewBag.Title = "Create Setup";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Create New Setup</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post" asp-action="Create" enctype="multipart/form-data" id="form">
+                        <div class="row">
+                            <!-- Left side: Canvas, Clear button, and Eraser button -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="canvas" class="form-label">Draw Setup Image</label>
+                                    <canvas id="canvas" class="border w-100 bg-white" width="500" height="300"></canvas>
+                                    <input type="hidden" asp-for="SetupImage" id="SetupImage" />
+                                    <button type="button" class="btn btn-secondary mt-2" id="clearCanvasButton">Clear Canvas</button>
+                                    <button type="button" class="btn btn-secondary mt-2" id="eraserButton">Eraser</button>
+                                </div>
+                            </div>
+                            <!-- Right side: Form fields -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="SetupNumber" class="form-label">Setup Number</label>
+                                    <input type="number" class="form-control" asp-for="SetupNumber" placeholder="Enter Setup Number">
+                                    <span asp-validation-for="SetupNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="JawId" class="form-label">Jaw</label>
+                                    <select class="form-control" asp-for="JawId" asp-items="ViewBag.Jaws">
+                                        <option value="">Select Jaw</option>
+                                    </select>
+                                    <span asp-validation-for="JawId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="Toothinfo" class="form-label">Tooth Info</label>
+                                    <textarea class="form-control" asp-for="Toothinfo" placeholder="Enter Tooth Info"></textarea>
+                                    <span asp-validation-for="Toothinfo" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="MaterialSize" class="form-label">Material Size</label>
+                                    <input type="number" class="form-control" asp-for="MaterialSize" placeholder="Enter Material Size">
+                                    <span asp-validation-for="MaterialSize" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <input type="hidden" asp-for="WorkSetupId" class="form-label" />
+                                </div>
+                                <div class="d-flex">
+                                    <button type="submit" class="btn btn-primary me-2">Create</button>
+                                    <a asp-action="Detail" asp-controller="WorkSetup" asp-route-Id="@Model.WorkSetupId" class="btn btn-secondary">Cancel</a>
+                                </div>
+                            </div>
+                            
+                        </div>
+
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Script {
+    <script>
+        // Setup canvas for drawing
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        let drawing = false;
+        let erasing = false;
+        let lastX = 0;
+        let lastY = 0;
+
+        canvas.addEventListener("contextmenu", (event) => event.preventDefault());
+
+        canvas.addEventListener('mousedown', (event) => {
+            drawing = true;
+            lastX = event.offsetX;
+            lastY = event.offsetY;
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            drawing = false;
+        });
+
+        canvas.addEventListener('mousemove', (event) => {
+            if (!drawing) return;
+            ctx.strokeStyle = erasing ? 'white' : 'black';
+            ctx.lineWidth = erasing ? 10 : 2;
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(event.offsetX, event.offsetY);
+            ctx.stroke();
+            lastX = event.offsetX;
+            lastY = event.offsetY;
+        });
+
+        // Convert canvas to image data before form submission
+        document.querySelector('#form').addEventListener('submit', function (e) {
+            const imageInput = document.getElementById('SetupImage');
+            imageInput.value = canvas.toDataURL('image/png');
+
+        });
+
+        console.log(1);
+
+        // Clear canvas button
+        const clearButton = document.getElementById('clearCanvasButton');
+        clearButton.addEventListener('click', () => {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+        });
+
+        // Eraser button
+        const eraserButton = document.getElementById('eraserButton');
+        eraserButton.addEventListener('click', () => {
+            erasing = !erasing;
+            eraserButton.classList.toggle('btn-danger', erasing);
+            eraserButton.classList.toggle('btn-secondary', !erasing);
+            eraserButton.textContent = erasing ? 'Draw' : 'Eraser';
+        });
+    </script>
+}

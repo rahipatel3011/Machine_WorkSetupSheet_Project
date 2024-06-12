@@ -1,0 +1,93 @@
+﻿@model SetupDTO
+
+@{
+    ViewBag.Title = "Delete Setup";
+}
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card mb-3">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Delete Setup</h4>
+                </div>
+                <div class="card-body">
+                        <div class="row">
+                            <!-- Left side: Canvas, Clear button, and Eraser button -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <label for="canvas" class="form-label">Draw Setup Image</label>
+                                <canvas id="canvas" class="border w-100 bg-white" width="500" height="300" disabled></canvas>
+                                </div>
+                            </div>
+                            <!-- Right side: Form fields -->
+                            <div class="col-md-6">
+                                <div class="mb-3">
+                                    <input type="hidden" asp-for="SetupId" />
+                                    <label for="SetupNumber" class="form-label">Setup Number</label>
+                                    <input type="number" class="form-control" asp-for="SetupNumber" placeholder="Enter Setup Number" disabled>
+                                    <span asp-validation-for="SetupNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="JawId" class="form-label">Jaw</label>
+                                    <select class="form-control" asp-for="JawId" asp-items="ViewBag.Jaws" disabled>
+                                        <option value="">Select Jaw</option>
+                                    </select>
+                                    <span asp-validation-for="JawId" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="Toothinfo" class="form-label">Tooth Info</label>
+                                <textarea class="form-control" asp-for="Toothinfo" placeholder="Enter Tooth Info" disabled></textarea>
+                                    <span asp-validation-for="Toothinfo" class="text-danger"></span>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="MaterialSize" class="form-label">Material Size</label>
+                                <input type="number" class="form-control" asp-for="MaterialSize" placeholder="Enter Material Size" disabled>
+                                    <span asp-validation-for="MaterialSize" class="text-danger"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@await Component.InvokeAsync("Modal", new {Id=Model.SetupId}) 
+
+
+
+@section Script {
+    <script>
+        // drawing canvas
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        // Ensure image URL is set before onload
+        const imageUrl = '@Model.SetupImage';
+        console.log(imageUrl);
+        const img = new Image();
+
+        img.onload = function () {
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        };
+        img.src = imageUrl;
+
+
+        let myModal = new bootstrap.Modal(document.getElementById('DeleteModal'));
+        @if ((ViewBag.Errors != null && ViewBag.setup != null) || ViewBag.setup != null)
+        {
+            <text>
+                myModal.show();
+            </text>
+        }
+        
+
+    </script>
+
+}
+

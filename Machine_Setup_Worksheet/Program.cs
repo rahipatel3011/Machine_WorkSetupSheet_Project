@@ -15,11 +15,15 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // DI for all repository
 builder.Services.AddScoped<IJawRepository, JawRepository>();
 builder.Services.AddScoped<IMachineRepository, MachineRepository>();
+builder.Services.AddScoped<IWorkSetupRepository, WorkSetupRepository>();
+builder.Services.AddScoped<ISetupRepository, SetupRepository>();
 
 
 // DI for all services
 builder.Services.AddScoped<IJawService, JawService>();
 builder.Services.AddScoped<IMachineService, MachineService>();
+builder.Services.AddScoped<IWorkSetupService, WorkSetupService>();
+builder.Services.AddScoped<ISetupService, SetupService>();
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));

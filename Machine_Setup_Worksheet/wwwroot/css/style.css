@@ -52,3 +52,46 @@ h1 {
 .jaws-action{
     width: 25%;
 }
+
+
+/* Setup */
+
+.setup-card {
+    transition: box-shadow 0.3s ease-in-out;
+}
+
+.setup-card:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.setup-image img {
+    border-radius: 5px;
+}
+
+
+.card-body .setup-details {
+    flex: 1;
+}
+
+
+/* Work setup */
+.card {
+    border: none;
+    background-color: #f8f9fa; /* Light gray background */
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+
+    .card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 1); /* Darker and more noticeable shadow */
+        transform: translateY(-3px);
+    }
+
+.card-body {
+    padding: 15px;
+    background-color: #E2EAF4; /* White background for card body */
+    border-radius: 5px;
+}
+
+.card a {
+    color: #343a40; /* Darker text color */
+}

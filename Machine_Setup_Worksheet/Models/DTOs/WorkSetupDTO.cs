@@ -1,13 +1,13 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Machine_Setup_Worksheet.Models
+namespace Machine_Setup_Worksheet.Models.DTOs
 {
-    public class WorkSetup
+    public class WorkSetupDTO
     {
         [Key]
         public Guid WorkSetupId { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Setup Name is required")]
         public string WorkSetupName { get; set; }
 
         public string? WorkSetupCode { get; set; }
@@ -15,7 +15,7 @@ namespace Machine_Setup_Worksheet.Models
         public string CompanyName { get; set; }
 
 
-        public ICollection<Setup>? Setups { get; set; }
+        public ICollection<SetupDTO>? Setups { get; set; }
 
         public string? Note { get; set; }
 

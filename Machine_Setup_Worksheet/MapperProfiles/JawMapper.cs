@@ -9,6 +9,9 @@ namespace Machine_Setup_Worksheet.MapperProfiles
         public JawMapper() { 
             CreateMap<JawsDTO,Jaw>().ReverseMap();
             CreateMap<MachineDTO,Machine>().ReverseMap();
+            CreateMap<WorkSetupDTO,WorkSetup>().ReverseMap();
+            CreateMap<Setup,SetupDTO>().ForMember(dest=>dest.ImageUrl, opt=>opt.MapFrom(src=>src.SetupImage));
+            CreateMap<SetupDTO, Setup>();
         }
     }
 }

@@ -49,9 +49,23 @@
                             </div>
                         </form>
                     }
+                    else if (ViewBag.setup != null)
+                    {
+                        <form action="" method="post" id="DeleteForm">
+                            <div class="mb-3">
+                                <p>Are you sure you want to delete this Setup</p>
+                                <input type="hidden" name="SetupId" value="@Model" />
+                                <div class="modal-footer pb-0">
+                                    <a type="button" class="btn btn-secondary" data-bs-dismiss="modal" asp-action="Detail" asp-controller="WorkSetup" asp-route-Id="@Model">Close</a>
+                                    <button type="submit" class="btn btn-danger">Delete</button>
+                                </div>
+                            </div>
+                        </form>
+                    }
                 </div>
 
             </div>
         </div>
     </div>
 </div>
+

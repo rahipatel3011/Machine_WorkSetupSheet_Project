@@ -24,7 +24,7 @@
                             <a class="nav-link active" aria-current="page" asp-action="Index" asp-controller="Home">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#">Add Setup</a>
+                            <a class="nav-link" asp-action="Create" asp-controller="WorkSetup">Add Setup</a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -55,5 +55,10 @@
         </div>
     </footer>
     @RenderSection("Script", false)
+    <!-- Include these in your _Layout.cshtml or directly in your view -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
 </body>
 </html>

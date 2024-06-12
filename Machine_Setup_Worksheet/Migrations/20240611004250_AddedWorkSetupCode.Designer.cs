@@ -4,6 +4,7 @@ using Machine_Setup_Worksheet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Machine_Setup_Worksheet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240611004250_AddedWorkSetupCode")]
+    partial class AddedWorkSetupCode
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -39,7 +42,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            JawId = new Guid("bab2d697-bef4-4db9-b065-1bf441e7ce7a"),
+                            JawId = new Guid("da0ece3f-9c79-4ed1-a92f-cf72926922ed"),
                             JawName = "Hard Jaws"
                         });
                 });
@@ -61,7 +64,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            MachineId = new Guid("eb691098-dee4-430b-b2e9-871a8002b941"),
+                            MachineId = new Guid("dcf79b70-f2b2-470a-9ab7-a74d5ae277b9"),
                             MachineName = "Hwacheon"
                         });
                 });
@@ -112,9 +115,11 @@ namespace Machine_Setup_Worksheet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Note")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkSetupCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("WorkSetupName")

@@ -1,0 +1,24 @@
+﻿@model IEnumerable<WorkSetupDTO>
+
+@{
+    ViewBag.Title = "Work Setups";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-center">All Work Setups</h2>
+    <div class="row">
+        @foreach (var workSetup in Model)
+        {
+            <div class="col-md-12 mb-3">
+                <div class="card shadow-sm">
+                    <a href="@Url.Action("Detail", "WorkSetup", new { Id = workSetup.WorkSetupId })" class="card-body text-dark text-decoration-none d-flex justify-content-between align-items-center">
+                        <span>
+                            @workSetup.WorkSetupName - @(string.IsNullOrEmpty(workSetup.WorkSetupCode) ? "" : workSetup.WorkSetupCode + " - ") @workSetup.CompanyName
+                        </span>
+                    </a>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
