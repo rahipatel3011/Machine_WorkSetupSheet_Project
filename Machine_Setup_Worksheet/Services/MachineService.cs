@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Repositories;
@@ -26,10 +27,17 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>All MachineDTO</returns>
         public async Task<IEnumerable<MachineDTO>> GetAllMachines()
         {
-            IEnumerable<Machine> allMachines = await _machineRepository.GetAll();
-            IEnumerable<MachineDTO> allMachinesDTO = _mapper.Map<IEnumerable<MachineDTO>>(allMachines);
+            try
+            {
+                IEnumerable<Machine> allMachines = await _machineRepository.GetAll();
+                IEnumerable<MachineDTO> allMachinesDTO = _mapper.Map<IEnumerable<MachineDTO>>(allMachines);
 
-            return allMachinesDTO;
+                return allMachinesDTO;
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while getting all machines in service layer", ex);
+            }
         }
 
 
@@ -43,17 +51,23 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>MachineDTO</returns>
         public async Task<MachineDTO> GetMachineById(Guid? machineId)
         {
-
-            if (machineId != null)
+            try
             {
-                Machine? machine = await _machineRepository.GetById(machineId.Value);
-                if(machine != null)
+                if (machineId != null)
                 {
-                    return _mapper.Map<MachineDTO>(machine);
+                    Machine? machine = await _machineRepository.GetById(machineId.Value);
+                    if (machine != null)
+                    {
+                        return _mapper.Map<MachineDTO>(machine);
+                    }
                 }
-            }
 
-            return new MachineDTO();
+                return new MachineDTO();
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while getting a machine in service layer with id:{machineId}", ex);
+            }
         }
 
 
@@ -63,10 +77,17 @@ namespace Machine_Setup_Worksheet.Services
         /// <param name="machineDTO">MachineDTO</param>
         /// <returns>MachineDTO</returns>
         public async Task<MachineDTO> SaveMachine(MachineDTO machineDTO)
-        {          
-            Machine machine = _mapper.Map<Machine>(machineDTO);
-            Machine createdMachine = await _machineRepository.Update(machine);
-            return _mapper.Map<MachineDTO>(createdMachine);
+        {
+            try
+            {
+                Machine machine = _mapper.Map<Machine>(machineDTO);
+                Machine createdMachine = await _machineRepository.Update(machine);
+                return _mapper.Map<MachineDTO>(createdMachine);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while saving a machine in service layer", ex);
+            }
         }
 
 
@@ -78,8 +99,15 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>number of affected data</returns>
         public async Task<int> DeleteMachine(Guid machineId)
         {
-            return await _machineRepository.Delete(machineId);
-            
+            try
+            {
+                return await _machineRepository.Delete(machineId);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while deleting a machine in service layer", ex);
+            }
+
         }
     }
 }

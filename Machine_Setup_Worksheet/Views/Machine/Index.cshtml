@@ -43,9 +43,9 @@
     </table>
 </div>
 <!-- invoke ViewComponent -->
-@if (ViewBag.Delete == true)
+@if (ViewBag.IsDeleteModal == true)
 {
-    @await Component.InvokeAsync("Modal", new { Id = ViewBagMachine.MachineId })
+    @await Component.InvokeAsync("Modal", new { dtoObject = ViewBagMachine, isDelete = true })
     ;
 
 }
@@ -69,11 +69,10 @@ else if (ViewBag.Open == true)
             myModal.show();
             </text>
         }
-        else if ((ViewBag.Errors != null && ViewBag.Delete == true) || ViewBag.Delete == true)
+        else if ((ViewBag.Errors != null && ViewBag.IsDeleteModal == true) || ViewBag.IsDeleteModal == true)
         {
             
             <text>
-                console.log("dfsddsf");
                 let deleteModal = new bootstrap.Modal(document.getElementById('DeleteModal'));
             deleteModal.show();
             </text>

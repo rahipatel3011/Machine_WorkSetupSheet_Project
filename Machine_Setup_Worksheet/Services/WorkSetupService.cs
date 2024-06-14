@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Repositories.IRepository;
@@ -24,9 +25,16 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>WorkSetupDTO</returns>
         public async Task<WorkSetupDTO> SaveWorkSetup(WorkSetupDTO workSetupDTO)
         {
-            WorkSetup workSetup = _mapper.Map<WorkSetup>(workSetupDTO);
-            WorkSetup savedWorkSetup = await  _workRepository.Save(workSetup);
-            return _mapper.Map<WorkSetupDTO>(savedWorkSetup);
+            try
+            {
+                WorkSetup workSetup = _mapper.Map<WorkSetup>(workSetupDTO);
+                WorkSetup savedWorkSetup = await _workRepository.Save(workSetup);
+                return _mapper.Map<WorkSetupDTO>(savedWorkSetup);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while saving a setup in service layer", ex);
+            }
         }
 
 
@@ -38,11 +46,18 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>int(affeceted records)</returns>
         public async Task<int> DeleteWorkSetup(Guid id)
         {
-            if (id != Guid.Empty)
+            try
             {
-                return await _workRepository.Delete(id);
+                if (id != Guid.Empty)
+                {
+                    return await _workRepository.Delete(id);
+                }
+                return 0;
             }
-            return 0;
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while deleting a setup in service layer with id:{id}", ex);
+            }
         }
 
 
@@ -53,7 +68,14 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>return IEnumerable of WorkSetupDTO</returns>
         public async Task<IEnumerable<WorkSetupDTO>> GetAllWorkSetupAsync()
         {
-            return _mapper.Map<IEnumerable<WorkSetupDTO>>(await _workRepository.GetAllAsync());
+            try
+            {
+                return _mapper.Map<IEnumerable<WorkSetupDTO>>(await _workRepository.GetAllAsync());
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while getting all setup in service layer", ex);
+            }
         }
 
 
@@ -65,15 +87,24 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>WorkSetupDTO</returns>
         public async Task<WorkSetupDTO> GetWorkSetupByIdAsync(Guid id)
         {
-            if(id != Guid.Empty)
+            try
             {
-                WorkSetup workSetup = await _workRepository.GetByIdAsync(id);
-                if (workSetup != null)
+                if (id != Guid.Empty)
+                {
+                    WorkSetup workSetup = await _workRepository.GetByIdAsync(id);
                     workSetup.Setups = workSetup.Setups.OrderBy(s => s.SetupNumber).ToList();
                     return _mapper.Map<WorkSetupDTO>(workSetup);
-
+                }
+                else
+                {
+                    throw new ArgumentNullException(nameof(id), "id cannot be null");
+                }
+                
             }
-            return new WorkSetupDTO();
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while getting a setup in service layer with id:{id}", ex);
+            }
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using Machine_Setup_Worksheet.Data;
+﻿using Machine_Setup_Worksheet.CustomExceptions;
+using Machine_Setup_Worksheet.Data;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Repositories.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -16,30 +17,58 @@ namespace Machine_Setup_Worksheet.Repositories
 
         public async Task<IEnumerable<WorkSetup>> GetAllAsync()
         {
-            return await _db.WorkSetups.ToListAsync();
+            try
+            {
+                return await _db.WorkSetups.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to fetch all work setup from the database", nameof(Jaw), ex);
+            }
         }
 
         public async Task<WorkSetup> GetByIdAsync(Guid id)
         {
-            return await _db.WorkSetups.Include(temp => temp.Setups).ThenInclude(temp => temp.Jaw).FirstOrDefaultAsync(workSetup => workSetup.WorkSetupId == id);
+            try
+            {
+                return await _db.WorkSetups.Include(temp => temp.Setups).ThenInclude(temp => temp.Jaw).FirstAsync(workSetup => workSetup.WorkSetupId == id);
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to fetch work setup from the database with id: {id}", nameof(Jaw), ex);
+            }
         }
 
         public async Task<WorkSetup> Save(WorkSetup workSetup)
         {
-            _db.WorkSetups.Update(workSetup);
-            await _db.SaveChangesAsync();
-            return workSetup;
+            try
+            {
+                _db.WorkSetups.Update(workSetup);
+                await _db.SaveChangesAsync();
+                return workSetup;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to fetch save work setup in the database", nameof(Jaw), ex);
+            }
         }
 
         public async Task<int> Delete(Guid id)
         {
-            WorkSetup? workSetup = await _db.WorkSetups.FirstOrDefaultAsync(workSetup => workSetup.WorkSetupId == id);
-            if (workSetup != null)
+            try
             {
-                _db.WorkSetups.Remove(workSetup);
-                return await _db.SaveChangesAsync();
+                WorkSetup? workSetup = await _db.WorkSetups.FirstAsync(workSetup => workSetup.WorkSetupId == id);
+                if (workSetup != null)
+                {
+                    _db.WorkSetups.Remove(workSetup);
+                    return await _db.SaveChangesAsync();
+                }
+                return 0;
             }
-            return 0;
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to delete work setup from the database", nameof(Jaw), ex);
+            }
         }
 
         

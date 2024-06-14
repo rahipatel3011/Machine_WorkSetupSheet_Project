@@ -31,9 +31,7 @@
 
                                 <div class="mb-3">
                                     <label for="JawId" class="form-label">Jaw</label>
-                                    <select class="form-control" asp-for="JawId" asp-items="ViewBag.Jaws" disabled>
-                                        <option value="">Select Jaw</option>
-                                    </select>
+                                    <input class="form-control" asp-for="Jaw.JawName" disabled />
                                     <span asp-validation-for="JawId" class="text-danger"></span>
                                 </div>
 
@@ -57,7 +55,10 @@
     </div>
 </div>
 
-@await Component.InvokeAsync("Modal", new {Id=Model.SetupId}) 
+@if(ViewBag.isDeleteModal == true)
+{
+    @await Component.InvokeAsync("Modal", new { dtoObject = Model, isDelete = true })
+}
 
 
 
@@ -69,7 +70,6 @@
 
         // Ensure image URL is set before onload
         const imageUrl = '@Model.SetupImage';
-        console.log(imageUrl);
         const img = new Image();
 
         img.onload = function () {
@@ -79,12 +79,9 @@
 
 
         let myModal = new bootstrap.Modal(document.getElementById('DeleteModal'));
-        @if ((ViewBag.Errors != null && ViewBag.setup != null) || ViewBag.setup != null)
-        {
-            <text>
-                myModal.show();
-            </text>
-        }
+        myModal.show();
+            
+        
         
 
     </script>

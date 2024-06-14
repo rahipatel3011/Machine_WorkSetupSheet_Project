@@ -17,8 +17,14 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
-            return View(jaws);
+            try
+            {
+                IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
+                return View(jaws);
+            }catch (Exception ex)
+            {
+                return StatusCode(500, "an Error Occured while fetching all jaws");
+            }
         }
 
 
@@ -34,92 +40,107 @@ namespace Machine_Setup_Worksheet.Controllers
             }
             catch (Exception ex)
             {
-
-                ViewBag.Errors = new[] { ex.Message }.ToList();
+                return StatusCode(400, "an Error occured while loading cretae jaw page");
             }
-
-            return RedirectToAction("Index");
         }
 
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm]JawsDTO jawsDTO)
         {
-
-            ViewBag.Open = true;
-            if (!ModelState.IsValid)
-            {
-                IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
-                ViewBag.Errors = ModelState.Values.SelectMany(x => x.Errors).Select(u => u.ErrorMessage);
-                return View("Index", jaws);
-            }
-
             try
             {
+                ViewBag.Open = true;
+                if (!ModelState.IsValid)
+                {
+                    IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
+                    ViewBag.Errors = ModelState.Values.SelectMany(x => x.Errors).Select(u => u.ErrorMessage);
+                    return View("Index", jaws);
+                }
+
                 await _jawService.SaveJaw(jawsDTO);
-            }catch(Exception ex)
-            {
-                ViewBag.Errors = new[] {ex.Message}.ToList();
+                return RedirectToAction("Index");
             }
-            
-            return RedirectToAction("Index");
+            catch (Exception ex)
+            {
+                return StatusCode(400, "an Error Occured while creating a jaw");
+            }
         }
 
         [HttpGet("edit/{JawId}")]
         public async Task<IActionResult> EditJaw([FromRoute]Guid? JawId)
         {
-            if(JawId == null)
+            try
             {
-                return RedirectToAction("Index","Jaws");
+                if (JawId == null)
+                {
+                    return RedirectToAction("Index", "Jaws");
+                }
+                await SetViewBag(JawId.Value, "Save");
+                IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
+                return View("Index", jaws);
             }
-            await SetViewBag(JawId.Value, "Save");
-            IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
-            return View("Index", jaws);
+            catch (Exception ex)
+            {
+                return StatusCode(400, "an Error occured while loading edit jaw page");
+            }
         }
 
 
         [HttpGet("delete/{JawId}")]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? JawId)
         {
-            if (JawId == null)
+            try
             {
-                return RedirectToAction("Index", "Jaws");
+                if (JawId == null)
+                {
+                    return RedirectToAction("Index", "Jaws");
+                }
+                await SetViewBag(JawId.Value, "Delete");
+                IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
+                return View("Index", jaws);
             }
-            await SetViewBag(JawId.Value, "Delete");
-            IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
-            return View("Index", jaws);
+            catch (Exception ex)
+            {
+                return StatusCode(401, "an Error occured while loading delete jaw page");
+            }
         }
 
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteJaw([FromForm] Guid JawId)
         {
-            int affectedRow = await _jawService.DeleteJaw(JawId);
-            if(affectedRow > 0)
+            try
             {
-                return RedirectToAction("Index", "Jaws");
-            }
+                int affectedRow = await _jawService.DeleteJaw(JawId);
+                if (affectedRow > 0)
+                {
+                    return RedirectToAction("Index", "Jaws");
+                }
 
-            ViewBag.Errors = new[] { "Jaws cannot be deleted please try again later" }.ToList();
-            await SetViewBag(JawId, "Delete");
-            IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
-            return View("Index", jaws);
+                ViewBag.Errors = new[] { "Jaws cannot be deleted please try again later" }.ToList();
+                await SetViewBag(JawId, "Delete");
+                IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
+                return View("Index", jaws);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(401, "an Error occured while deleting a jaw");
+            }
         }
 
         private async Task SetViewBag(Guid JawId, string SaveOrDeleteModal)
         {
             JawsDTO jaw = await _jawService.GetJawById(JawId);
             ViewBag.jaw = jaw;
-            if(SaveOrDeleteModal.ToLower() == "save")
+            if (SaveOrDeleteModal.ToLower() == "save")
             {
                 ViewBag.Open = true;
-            }else if(SaveOrDeleteModal.ToLower() == "delete")
-            {
-                ViewBag.Delete = true;
             }
-            
+            else if (SaveOrDeleteModal.ToLower() == "delete")
+            {
+                ViewBag.isDeleteModal = true;
+            }
         }
     }
-
-
 
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Data;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
@@ -24,7 +25,13 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>All Jaws</returns>
         public async Task<IEnumerable<Jaw>> GetAll()
         {
-            return await _db.Jaws.ToListAsync();
+            try
+            {
+                return await _db.Jaws.ToListAsync();
+            }catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to fetch all Jaws from the database", nameof(Jaw),ex);
+            }
         }
 
 
@@ -35,8 +42,14 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Jaw or null</returns>
         public async Task<Jaw> GetById(Guid id)
         {
-            Jaw? foundJaw = await _db.Jaws.FirstOrDefaultAsync(jaw=>jaw.JawId == id);
-            return foundJaw;
+            try
+            {
+                Jaw foundJaw = await _db.Jaws.FirstAsync(jaw=>jaw.JawId == id);
+                return foundJaw;
+            }catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to fetch Jaw with id: {id}", nameof(Jaw), ex);
+            }
                 
         }
 
@@ -48,9 +61,15 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Created Jaws</returns>
         public async Task<Jaw> Create(Jaw jaw)
         {
-            _db.Jaws.Add(jaw);
-            await _db.SaveChangesAsync();
-            return jaw;
+            try
+            {
+                _db.Jaws.Add(jaw);
+                await _db.SaveChangesAsync();
+                return jaw;
+            }catch(Exception ex)
+            {
+                throw new DatabaseException($"Failed to save Jaw to the database", nameof(Jaw), ex);
+            }
         }
 
 
@@ -61,9 +80,15 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Jaw</returns>
         public async Task<Jaw> Update(Jaw jaw)
         {
-            _db.Jaws.Update(jaw);
-            await _db.SaveChangesAsync(true);
-            return jaw;
+            try
+            {
+                _db.Jaws.Update(jaw);
+                await _db.SaveChangesAsync(true);
+                return jaw;
+            }catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to save Jaw to the database", nameof(Jaw), ex);
+            }
         }
 
 
@@ -74,14 +99,21 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>number of affected data</returns>
         public async Task<int> Delete(Guid id)
         {
-            Jaw? foundJaw = await _db.Jaws.FirstOrDefaultAsync(jaw => jaw.JawId == id);
-            if(foundJaw != null)
+            try
             {
-                _db.Jaws.Remove(foundJaw);
-                return await _db.SaveChangesAsync();
-            }
+                Jaw foundJaw = await _db.Jaws.FirstAsync(jaw => jaw.JawId == id);
+                if(foundJaw != null)
+                {
+                    _db.Jaws.Remove(foundJaw);
+                    return await _db.SaveChangesAsync();
+                }
 
-            return 0;
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to Delete Jaw to the database", nameof(Jaw), ex);
+            }
         }
     }
 }

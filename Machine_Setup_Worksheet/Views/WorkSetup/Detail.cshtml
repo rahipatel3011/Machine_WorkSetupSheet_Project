@@ -19,25 +19,40 @@
                     <div class="row">
                         @foreach (SetupDTO setup in Model.Setups)
                         {
+                            <form action="/setup/@setup.WorkSetupId/delete" method="post">
+                                <input type="hidden" name="SetupId" value="@setup.SetupId" />
+                                <input type="hidden" name="SetupNumber" value="@setup.SetupNumber" />
+                                <input type="hidden" name="JawId" value="@setup.JawId" />
+                                <input type="hidden" name="Jaw" value="@setup.Jaw?.JawName" />
+                                <input type="hidden" name="Toothinfo" value="@setup.Toothinfo" />
+                                <input type="hidden" name="SetupImage" value="@setup.SetupImage" />
+                                <input type="hidden" name="ImageUrl" value="@setup.ImageUrl" />
+                                <input type="hidden" name="MaterialSize" value="@setup.MaterialSize" />
+                                <input type="hidden" name="WorkSetupId" value="@Model.WorkSetupId" />
+                                <input type="hidden" name="SetupId" value="@setup.SetupId"/>
+
                             <div class="col-md-12 mb-4">
-                                
                                     <div class="card shadow setup-card">
 
                                         <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
                                             <h5 class="mb-0">Setup #@setup.SetupNumber</h5>
                                             <div>
-                                        <a href="@Url.Action("Update", "Setup", new { setupId = setup.SetupId, id= setup.WorkSetupId })" class="text-decoration-none text-dark me-2">
+
+                                                @* Edit Button *@
+                                                <a href="@Url.Action("Update", "Setup", new { setupId=setup.SetupId ,id= setup.WorkSetupId })" class="text-decoration-none text-dark me-2">
                                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                                 <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
                                                 <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
                                             </svg>
                                             </a>
 
-                                            <a href="@(Url.Action("Delete","Setup", new {setupId=setup.SetupId, id=setup.WorkSetupId}))" class="text-decoration-none text-danger">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-                                                        <path fill="#9E2E2E" stroke="#9E2E2E" stroke-width="1.5" d="M3.646 3.646a.75.75 0 0 1 1.061 0L8 7.293l3.293-3.647a.75.75 0 0 1 1.061 1.061L9.061 8l3.293 3.646a.75.75 0 1 1-1.061 1.061L8 9.061l-3.293 3.647a.75.75 0 1 1-1.061-1.061L6.939 8 3.646 4.707a.75.75 0 0 1 0-1.061z" />
-                                                    </svg>
-                                            </a>
+
+                                            @*Remove Cross button*@
+                                            <button type="submit" style="vertical-align: 0" class="btn p-0 border-0 bg-transparent text-danger">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+                                                    <path fill="#9E2E2E" stroke="#9E2E2E" stroke-width="1.5" d="M3.646 3.646a.75.75 0 0 1 1.061 0L8 7.293l3.293-3.647a.75.75 0 0 1 1.061 1.061L9.061 8l3.293 3.646a.75.75 0 1 1-1.061 1.061L8 9.061l-3.293 3.647a.75.75 0 1 1-1.061-1.061L6.939 8 3.646 4.707a.75.75 0 0 1 0-1.061z" />
+                                                </svg>
+                                            </button>
                                             </div>
                                         </div>
 
@@ -60,25 +75,50 @@
                                     </div>
                                 
                             </div>
+                            </form>
                         }
                     </div>
-                    <div class="text-center">
+                    <div class="text-center mb-2">
                         <a class="btn btn-info" asp-action="Create" asp-controller="Setup" asp-route-id="@Model.WorkSetupId">Add Setup</a>
                     </div>
+                    @if (!string.IsNullOrEmpty(Model.Note))
+                    {
+                        <div class="worksetup-note bg-transparent mb-2">
+                            <textarea asp-for="Note" class="container-fluid" disabled></textarea>
+                        </div>
+                    }
+                    <div class="text-center">
+                        <a class="btn btn-warning" asp-action="Update" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Edit Work Setup</a>
+                        <a class="btn btn-danger" asp-action="Delete" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Delete Work Setup</a>
+                    </div>
+                    @if (ViewBag.Errors != null)
+                    {
+                        <div class="alert alert-danger mt-3">
+                            <ul>
+                                @foreach (var error in ViewBag.Errors)
+                                {
+                                    <li>@error</li>
+                                }
+                            </ul>
+                        </div>
+                    }
                 </div>
             </div>
-            @if (ViewBag.Errors != null)
-            {
-                <div class="alert alert-danger mt-3">
-                    <ul>
-                        @foreach (var error in ViewBag.Errors)
-                        {
-                            <li>@error</li>
-                        }
-                    </ul>
-                </div>
-            }
+           
         </div>
     </div>
 </div>
+
+@if (ViewBag.isDeleteModal == true)
+{
+    @await Component.InvokeAsync("Modal", new { dtoObject = Model, isDelete = true })
+
+    @section Script {
+    <script>
+        let deleteModal = new bootstrap.Modal(document.getElementById('DeleteModal'));
+        deleteModal.show();
+    </script>
+    }
+}
+
 

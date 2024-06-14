@@ -15,7 +15,7 @@ namespace Machine_Setup_Worksheet.Models.DTOs
         public string CompanyName { get; set; }
 
 
-        public ICollection<SetupDTO>? Setups { get; set; }
+        public ICollection<SetupDTO>? Setups { get; set; } = new List<SetupDTO>();
 
         public string? Note { get; set; }
 

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Repositories.IRepository;
@@ -25,10 +26,16 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>All JawsDTO</returns>
         public async Task<IEnumerable<JawsDTO>> GetAllJaws()
         {
-            IEnumerable<Jaw> allJaws = await _jawRepository.GetAll();
-            IEnumerable<JawsDTO> allJawsDTO = _mapper.Map<IEnumerable<JawsDTO>>(allJaws);
+            try
+            {
+                IEnumerable<Jaw> allJaws = await _jawRepository.GetAll();
+                IEnumerable<JawsDTO> allJawsDTO = _mapper.Map<IEnumerable<JawsDTO>>(allJaws);
 
-            return allJawsDTO;
+                return allJawsDTO;
+            }catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while getting all jaws in service layer", ex);
+            }
         }
 
 
@@ -42,17 +49,19 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>JawsDTO</returns>
         public async Task<JawsDTO> GetJawById(Guid? jawId)
         {
-
-            if (jawId != null)
+            try
             {
-                Jaw? jaw = await _jawRepository.GetById(jawId.Value);
-                if(jaw != null)
+                if (jawId != null)
                 {
+                    Jaw? jaw = await _jawRepository.GetById(jawId.Value);
                     return _mapper.Map<JawsDTO>(jaw);
                 }
+                throw new ArgumentNullException(nameof(jawId), "Jaw id cannot be null");
             }
-
-            return new JawsDTO();
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while getting a jaws with id {jawId} in service layer", ex);
+            }
         }
 
 
@@ -62,10 +71,17 @@ namespace Machine_Setup_Worksheet.Services
         /// <param name="jawsDTO">JawsDTO</param>
         /// <returns>JawsDTO</returns>
         public async Task<JawsDTO> SaveJaw(JawsDTO jawsDTO)
-        {          
-            Jaw jaw = _mapper.Map<Jaw>(jawsDTO);
-            Jaw createdJaw = await _jawRepository.Update(jaw);
-            return _mapper.Map<JawsDTO>(createdJaw);
+        {
+            try
+            {
+                Jaw jaw = _mapper.Map<Jaw>(jawsDTO);
+                Jaw createdJaw = await _jawRepository.Update(jaw);
+                return _mapper.Map<JawsDTO>(createdJaw);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while saving a jaw in service layer", ex);
+            }
         }
 
 
@@ -76,8 +92,14 @@ namespace Machine_Setup_Worksheet.Services
         /// <returns>number of affected data</returns>
         public async Task<int> DeleteJaw(Guid jawId)
         {
-            return await _jawRepository.Delete(jawId);
-            
+            try
+            {
+                return await _jawRepository.Delete(jawId);
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException("An Error occured while deleting a jaw in service layer", ex);
+            }
         }
     }
 }

@@ -6,11 +6,11 @@ namespace Machine_Setup_Worksheet.Components
 {
     public class ModalViewComponent : ViewComponent
     {
-        public async Task<IViewComponentResult> InvokeAsync(object dtoObject, Guid? Id)
+        public async Task<IViewComponentResult> InvokeAsync(object dtoObject, Boolean isDelete)
         {
-            if(Id != null)
+            if(isDelete)
             {
-                return View("Delete", Id);
+                return View("Delete", dtoObject);
             }
             return View("Modal", dtoObject);
         }

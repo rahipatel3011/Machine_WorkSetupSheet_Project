@@ -19,8 +19,15 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
-            return View(machines);
+            try
+            {
+                IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+                return View(machines);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "an Error occured while fetching all machines");
+            }
         }
 
 
@@ -35,77 +42,93 @@ namespace Machine_Setup_Worksheet.Controllers
             }
             catch (Exception ex)
             {
-
-                ViewBag.Errors = new[] { ex.Message }.ToList();
+                return StatusCode(500, "an Error occured while loading create machine page");
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] MachineDTO machineDTO)
         {
-
-            ViewBag.Open = true;
-            if (!ModelState.IsValid)
-            {
-                IEnumerable<MachineDTO> machines= await _machineService.GetAllMachines();
-                ViewBag.Errors = ModelState.Values.SelectMany(x => x.Errors).Select(u => u.ErrorMessage);
-                return View("Index", machines);
-            }
-
             try
             {
+                ViewBag.Open = true;
+                if (!ModelState.IsValid)
+                {
+                    IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+                    ViewBag.Errors = ModelState.Values.SelectMany(x => x.Errors).Select(u => u.ErrorMessage);
+                    return View("Index", machines);
+                }
                 await _machineService.SaveMachine(machineDTO);
+
+                return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                ViewBag.Errors = new[] { ex.Message }.ToList();
+                return StatusCode(500, "an Error occured while saving a machine");
             }
-
-            return RedirectToAction(nameof(Index));
         }
 
 
         [HttpGet("edit/{MachineId}")]
         public async Task<IActionResult> EditMachine([FromRoute] Guid? MachineId)
         {
-            if (MachineId == null)
+            try
             {
-                return RedirectToAction(nameof(Index), nameof(JawsController));
+                if (MachineId == null)
+                {
+                    return RedirectToAction(nameof(Index), nameof(JawsController));
+                }
+                await SetViewBag(MachineId.Value, "Save");
+                IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+                return View("Index", machines);
             }
-            await SetViewBag(MachineId.Value, "Save");
-            IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
-            return View("Index", machines);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "an Error occured while loading edit machine page");
+            }
         }
 
 
         [HttpGet("delete/{MachineId}")]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? MachineId)
         {
-            if (MachineId == null)
+            try
             {
-                return RedirectToAction("Index", "Machine");
+                if (MachineId == null)
+                {
+                    return RedirectToAction("Index", "Machine");
+                }
+                await SetViewBag(MachineId.Value, "Delete");
+                IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+                return View("Index", machines);
             }
-            await SetViewBag(MachineId.Value, "Delete");
-            IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
-            return View("Index", machines);
+            catch (Exception ex)
+            {
+                return StatusCode(500, "an Error occured while loading a delete machine page");
+            }
         }
 
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteMachine([FromForm] Guid MachineId)
         {
-            int affectedRow = await _machineService.DeleteMachine(MachineId);
-            if (affectedRow > 0)
+            try
             {
-                return RedirectToAction("Index", "Machine");
-            }
+                int affectedRow = await _machineService.DeleteMachine(MachineId);
+                if (affectedRow > 0)
+                {
+                    return RedirectToAction("Index", "Machine");
+                }
 
-            ViewBag.Errors = new[] { "Machine cannot be deleted please try again later" }.ToList();
-            await SetViewBag(MachineId, "Delete");
-            IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
-            return View("Index", machines);
+                ViewBag.Errors = new[] { "Machine cannot be deleted please try again later" }.ToList();
+                await SetViewBag(MachineId, "Delete");
+                IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+                return View("Index", machines);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "an Error occured while deleting a machine");
+            }
         }
 
 
@@ -120,7 +143,7 @@ namespace Machine_Setup_Worksheet.Controllers
             }
             else if (SaveOrDeleteModal.ToLower() == "delete")
             {
-                ViewBag.Delete = true;
+                ViewBag.IsDeleteModal = true;
             }
 
         }

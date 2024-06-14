@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Data;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
@@ -25,7 +26,14 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>All Machines</returns>
         public async Task<IEnumerable<Machine>> GetAll()
         {
-            return await _db.Machines.ToListAsync();
+            try
+            {
+                return await _db.Machines.ToListAsync();
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to fetch all Machines from the database", nameof(Jaw), ex);
+            }
         }
 
 
@@ -36,9 +44,16 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Machine or null</returns>
         public async Task<Machine> GetById(Guid id)
         {
-            Machine? foundMachine = await _db.Machines.FirstOrDefaultAsync(machine=>machine.MachineId == id);
-            return foundMachine;
-                
+            try
+            {
+                Machine foundMachine = await _db.Machines.FirstAsync(machine => machine.MachineId == id);
+                return foundMachine;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to fetch a machine with id: {id} from the database", nameof(Jaw), ex);
+            }
+
         }
 
 
@@ -49,9 +64,16 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Created Machines</returns>
         public async Task<Machine> Create(Machine machine)
         {
-            _db.Machines.Add(machine);
-            await _db.SaveChangesAsync();
-            return machine;
+            try
+            {
+                _db.Machines.Add(machine);
+                await _db.SaveChangesAsync();
+                return machine;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to create machine in the database", nameof(Jaw), ex);
+            }
         }
 
 
@@ -62,9 +84,16 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>Machines</returns>
         public async Task<Machine> Update(Machine machine)
         {
-            _db.Machines.Update(machine);
-            await _db.SaveChangesAsync(true);
-            return machine;
+            try
+            {
+                _db.Machines.Update(machine);
+                await _db.SaveChangesAsync(true);
+                return machine;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException("Failed to update a machine in the database", nameof(Jaw), ex);
+            }
         }
 
 
@@ -77,14 +106,21 @@ namespace Machine_Setup_Worksheet.Repositories
         /// <returns>number of affected data</returns>
         public async Task<int> Delete(Guid id)
         {
-            Machine? foundMachine = await _db.Machines.FirstOrDefaultAsync(machine => machine.MachineId == id);
-            if(foundMachine != null)
+            try
             {
-                _db.Machines.Remove(foundMachine);
-                return await _db.SaveChangesAsync();
-            }
+                Machine foundMachine = await _db.Machines.FirstAsync(machine => machine.MachineId == id);
+                if (foundMachine != null)
+                {
+                    _db.Machines.Remove(foundMachine);
+                    return await _db.SaveChangesAsync();
+                }
 
-            return 0;
+                return 0;
+            }
+            catch (Exception ex)
+            {
+                throw new DatabaseException($"Failed to delete machine from the database with id: {id}", nameof(Jaw), ex);
+            }
         }
 
     }
