@@ -4,6 +4,7 @@ using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Repositories.IRepository;
 using Machine_Setup_Worksheet.Services.IServices;
+using System.Collections.Generic;
 
 namespace Machine_Setup_Worksheet.Services
 {
@@ -33,7 +34,7 @@ namespace Machine_Setup_Worksheet.Services
             }
             catch (Exception ex)
             {
-                throw new ServiceException($"An Error occured while saving a setup in service layer", ex);
+                throw new ServiceException($"An Error occured while saving a work setup in service layer", ex);
             }
         }
 
@@ -56,7 +57,7 @@ namespace Machine_Setup_Worksheet.Services
             }
             catch (Exception ex)
             {
-                throw new ServiceException($"An Error occured while deleting a setup in service layer with id:{id}", ex);
+                throw new ServiceException($"An Error occured while deleting a work setup in service layer with id:{id}", ex);
             }
         }
 
@@ -74,7 +75,7 @@ namespace Machine_Setup_Worksheet.Services
             }
             catch (Exception ex)
             {
-                throw new ServiceException($"An Error occured while getting all setup in service layer", ex);
+                throw new ServiceException($"An Error occured while getting all work setups in service layer", ex);
             }
         }
 
@@ -103,9 +104,101 @@ namespace Machine_Setup_Worksheet.Services
             }
             catch (Exception ex)
             {
-                throw new ServiceException($"An Error occured while getting a setup in service layer with id:{id}", ex);
+                throw new ServiceException($"An Error occured while getting a work setup in service layer with id:{id}", ex);
             }
         }
 
+
+
+        /// <summary>
+        /// Filter WorkSetup using searchTerm
+        /// </summary>
+        /// <param name="searchTerm">search keywork</param>
+        /// <returns><IEnumerable<WorkSetupDTO>></returns>
+        /// <exception cref="ServiceException">Service Exception</exception>
+        public async Task<IEnumerable<WorkSetupDTO>> GetBySearchAsync(string searchTerm)
+        {
+            try
+            {
+                IEnumerable<WorkSetup> allWorkSetups = await _workRepository.GetAllAsync();
+                IEnumerable<WorkSetupDTO> allWorkSetupsDTOs = _mapper.Map< IEnumerable < WorkSetupDTO >>(allWorkSetups);
+                return allWorkSetupsDTOs.Where(ws=> ContainsKeyword(ws,searchTerm)).ToList();
+            }
+            catch (Exception ex)
+            {
+                throw new ServiceException($"An Error occured while getting a work setup in service layer with search:{searchTerm}", ex);
+            }
+        }
+
+
+        #region private methods
+        private bool ContainsKeyword(WorkSetupDTO workSetup, string keyword)
+        {
+            if (workSetup == null)
+                return false;
+
+            if (String.IsNullOrWhiteSpace(keyword))
+                return true;
+
+            // Check properties of WorkSetupDTO
+            if (RemoveWhiteSpaces(workSetup.WorkSetupName)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true ||
+                RemoveWhiteSpaces(workSetup.WorkSetupCode)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true ||
+                RemoveWhiteSpaces(workSetup.CompanyName)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true ||
+                RemoveWhiteSpaces(workSetup.Note)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+
+            // Check each SetupDTO in the Setups collection
+            foreach (var setup in workSetup.Setups ?? Enumerable.Empty<SetupDTO>())
+            {
+                if (ContainsKeyword(setup, keyword))
+                    return true;
+            }
+
+            return false;
+        }
+
+        private bool ContainsKeyword(SetupDTO setup, string keyword)
+        {
+            if (setup == null)
+                return false;
+
+            // Check properties of SetupDTO
+            if (RemoveWhiteSpaces(setup.Toothinfo)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true ||
+                RemoveWhiteSpaces(Convert.ToString(setup.MaterialSize)).Contains(keyword, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+
+            // Check the associated JawsDTO
+            if (setup.Jaw != null && ContainsKeyword(setup.Jaw, keyword))
+                return true;
+
+            return false;
+        }
+
+        private bool ContainsKeyword(JawsDTO jaw, string keyword)
+        {
+            if (jaw == null)
+                return false;
+
+            // Check properties of JawsDTO
+            if (RemoveWhiteSpaces(jaw.JawName)?.Contains(keyword, StringComparison.OrdinalIgnoreCase) == true)
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private string RemoveWhiteSpaces(string input)
+        {
+            if (input == null)
+                return null;
+
+            return new string(input.Where(c => !char.IsWhiteSpace(c)).ToArray());
+        }
+        #endregion
     }
 }

@@ -3,16 +3,48 @@
     ViewBag.Title = "Home Page";
 }
 
-<form action="" class="centered-form">
+<form asp-action="Index" asp-controller="WorkSetup" method="get" class="centered-form">
     <h1 class="block">Find machine setup</h1>  
-        <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4 searchbar">
-            <div class="input-group">
-                <input type="search" placeholder="What're you searching for?" aria-describedby="button-addon1" class="form-control border-0 bg-light">
-                <div class="input-group-append">
-                    <button id="button-addon1" type="submit" class="btn btn-link text-primary"><i class="bi bi-search"></i></button>
-                </div>
+    <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4 searchbar">
+        <div class="input-group">
+        <input type="search" name="searchKey" placeholder="What're you searching for?" aria-describedby="button-addon1" class="form-control border-0 bg-light">
+            <div class="input-group-append">
+                <button id="button-addon1" type="submit" class="btn btn-link text-primary"><i class="bi bi-search"></i></button>
             </div>
         </div>
-    </form>
+    </div>
+    <div id="suggestionBox" class="list-group mt-2"></div>
+</form>
+
+@section Script{
+    <script>
+        window.addEventListener('load', function () {
+            const searchBox = document.getElementById('searchBox');
+            const suggestionBox = document.getElementById('suggestionBox');
+            searchBox.addEventListener("input", async () => {
+                const query = searchBox.value.trim();
+                if(query.length > 0){
+                    const response = await fetch(`/WorkSetup?searchKey=${encodeURIComponent(query)}`);
+                    if(!response.ok){
+                        console.log("not");
+                    }
+
+                    const data = response.json();
+                    suggestionBox.innerHTML = "";
+                    if(data.length > 0){
+                        data.forEach(item => {
+                            suggestionBox.innerHTML += `<a href="/WorkSetup/Details/${item.workSetupId}" class="list-group-item list-group-item-action">${item.workSetupName}</a>`;
+                        });
+                    } else {
+                        suggestionBox.innerHTML = '<div class="list-group-item">No results found</div>';
+                    }
+
+                } else {
+                    suggestionBox.innerHTML = ''; // Clear suggestion box if query is empty
+                }
+            });
+        }
+    </script>
+}
 
 

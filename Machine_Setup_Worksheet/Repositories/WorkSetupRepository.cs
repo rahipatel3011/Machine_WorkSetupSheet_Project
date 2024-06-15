@@ -19,7 +19,7 @@ namespace Machine_Setup_Worksheet.Repositories
         {
             try
             {
-                return await _db.WorkSetups.ToListAsync();
+                return await _db.WorkSetups.Include(temp => temp.Setups).ThenInclude(temp => temp.Jaw).ToListAsync();
             }
             catch (Exception ex)
             {

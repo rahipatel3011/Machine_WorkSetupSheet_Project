@@ -7,8 +7,7 @@ namespace Machine_Setup_Worksheet.Services.IServices
 
         Task<IEnumerable<WorkSetupDTO>> GetAllWorkSetupAsync();
         Task<WorkSetupDTO> GetWorkSetupByIdAsync(Guid id);
-        // Task<WorkSetup> GetByNameAsync(string name);
-        // Task<WorkSetup> GetByNumberAsync(string code);
+        Task<IEnumerable<WorkSetupDTO>> GetBySearchAsync(string searchTerm);
         Task<WorkSetupDTO> SaveWorkSetup(WorkSetupDTO workSetup);
         Task<int> DeleteWorkSetup(Guid id);
 

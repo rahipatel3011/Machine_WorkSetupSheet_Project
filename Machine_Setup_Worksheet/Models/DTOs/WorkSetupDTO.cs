@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Machine_Setup_Worksheet.Models.DTOs
 {
@@ -18,6 +19,10 @@ namespace Machine_Setup_Worksheet.Models.DTOs
         public ICollection<SetupDTO>? Setups { get; set; } = new List<SetupDTO>();
 
         public string? Note { get; set; }
+        //public Guid MachineId { get; set; }
+
+        //[ForeignKey("MachineId")]
+        //public MachineDTO? machine { get; set; }
 
     }
 }

@@ -15,12 +15,13 @@ namespace Machine_Setup_Worksheet.Controllers
         }
 
 
-        [HttpGet]
-        public async Task<IActionResult> Index()
+        [HttpGet()]
+        public async Task<IActionResult> Index([FromQuery]string searchKey = "")
         {
             try
             {
-                IEnumerable<WorkSetupDTO> allWorkSetupDTO = await _workSetupService.GetAllWorkSetupAsync();
+                // IEnumerable<WorkSetupDTO> allWorkSetupDTO = await _workSetupService.GetAllWorkSetupAsync();
+                IEnumerable<WorkSetupDTO> allWorkSetupDTO = await _workSetupService.GetBySearchAsync(searchKey);
                 return View(allWorkSetupDTO);
             }
             catch (Exception ex)
