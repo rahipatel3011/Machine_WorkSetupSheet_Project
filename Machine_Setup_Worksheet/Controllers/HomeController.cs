@@ -13,7 +13,7 @@ namespace Machine_Setup_Worksheet.Controllers
             _workSetupService = workSetupService;
         }
 
-        [HttpGet("")]
+        [HttpGet("/")]
         public IActionResult Index()
         {
             return View();

@@ -1,6 +1,7 @@
 ﻿
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Machine_Setup_Worksheet.Controllers
@@ -16,12 +17,20 @@ namespace Machine_Setup_Worksheet.Controllers
 
 
         [HttpGet()]
-        public async Task<IActionResult> Index([FromQuery]string searchKey = "")
+        public async Task<IActionResult> Index([FromQuery] bool json, [FromQuery]string searchKey = "")
         {
             try
             {
                 // IEnumerable<WorkSetupDTO> allWorkSetupDTO = await _workSetupService.GetAllWorkSetupAsync();
                 IEnumerable<WorkSetupDTO> allWorkSetupDTO = await _workSetupService.GetBySearchAsync(searchKey);
+                if(json == true)
+                {
+                    return new JsonResult(new { setups = allWorkSetupDTO })
+                    {
+                        StatusCode = 200, // Set status code to 200 OK
+                        ContentType = "application/json" // Set content type explicitly
+                    };
+                }
                 return View(allWorkSetupDTO);
             }
             catch (Exception ex)

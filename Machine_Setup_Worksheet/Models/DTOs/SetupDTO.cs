@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Machine_Setup_Worksheet.Models.DTOs
 {
@@ -25,6 +26,7 @@ namespace Machine_Setup_Worksheet.Models.DTOs
         public Guid WorkSetupId { get; set; }
 
         [ForeignKey("WorkSetupId")]
+        [JsonIgnore]
         public WorkSetupDTO? WorkSetup { get; set; }
 
 

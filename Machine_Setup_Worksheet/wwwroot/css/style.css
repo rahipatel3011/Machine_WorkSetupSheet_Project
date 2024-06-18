@@ -1,3 +1,10 @@
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+
 .container {
     
 }
@@ -7,17 +14,7 @@
 }
 
 
-.centered-form {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    height: 85vh; /* This makes the container take up the full height of the screen */
-}
 
-.searchbar{
-    width: 50%;
-}
 
 footer {
     text-align: center;
@@ -35,7 +32,7 @@ h1 {
     color: #fff;
 }
 
-# createButton {
+#createButton {
     height: fit-content;
 }
 
@@ -62,10 +59,6 @@ h1 {
 
 .setup-card:hover {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
-
-.setup-image img {
-    border-radius: 5px;
 }
 
 
@@ -95,3 +88,68 @@ h1 {
 .card a {
     color: #343a40; /* Darker text color */
 }
+
+/* search box */
+
+.page-content {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align items to the top of the container */
+    min-height: 100%; /* Ensure page content stretches to at least full viewport height */
+    padding: 20px; /* Adjust padding as needed */
+}
+
+.centered-form {
+    width: 100%;
+    max-width: 600px; /* Limit the maximum width of the form */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.search-container {
+    width: 100%;
+    max-width: 400px; /* Adjust maximum width of the search container */
+}
+
+.searchbar {
+    margin-top: 20px; /* Space between search bar and heading */
+    background-color: #ffffff;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Example shadow */
+}
+
+.input-group {
+    width: 100%;
+}
+
+.input-group-append {
+    display: flex;
+    align-items: center;
+}
+
+#suggestionBox {
+    list-style-type: none;
+    margin-top: 10px; /* Space between search bar and suggestion box */
+    padding: 0;
+    background-color: #ffffff;
+    border: 1px solid #ced4da;
+    border-top: none;
+    border-radius: 0 0 5px 5px; /* Rounded bottom corners */
+    max-height: 200px; /* Limit height to prevent overflow */
+    overflow-y: auto; /* Enable vertical scrolling if needed */
+}
+
+    #suggestionBox li {
+        padding: 10px;
+    }
+
+        #suggestionBox li a {
+            text-decoration: none;
+            color: #343a40; /* Dark text color */
+        }
+
+        #suggestionBox li:hover {
+            background-color: #f0f0f0; /* Hover background color */
+        }

@@ -2,48 +2,60 @@
 @{
     ViewBag.Title = "Home Page";
 }
-
-<form asp-action="Index" asp-controller="WorkSetup" method="get" class="centered-form">
-    <h1 class="block">Find machine setup</h1>  
-    <div class="p-1 bg-light rounded rounded-pill shadow-sm mb-4 searchbar">
-        <div class="input-group">
-        <input type="search" name="searchKey" placeholder="What're you searching for?" aria-describedby="button-addon1" class="form-control border-0 bg-light">
-            <div class="input-group-append">
-                <button id="button-addon1" type="submit" class="btn btn-link text-primary"><i class="bi bi-search"></i></button>
+<div class="page-content">
+    <form asp-action="Index" asp-controller="WorkSetup" method="get" class="centered-form">
+        <h1 class="block">Find machine setup</h1>
+        <div class="search-container">
+            <div class="searchbar">
+                <div class="input-group">
+                    <input type="search" name="searchKey" placeholder="What're you searching for?" aria-describedby="button-addon1" class="form-control border-0 bg-light" id="searchBox" autocomplete="off">
+                    <div class="input-group-append">
+                        <button id="button-addon1" type="button" class="btn btn-link text-primary"><i class="bi bi-search"></i></button>
+                    </div>
+                </div>
             </div>
+            <ul id="suggestionBox" class="list-group">
+                <!-- Suggestions will be dynamically added here -->
+            </ul>
         </div>
-    </div>
-    <div id="suggestionBox" class="list-group mt-2"></div>
-</form>
+    </form>
+</div>
 
 @section Script{
     <script>
-        window.addEventListener('load', function () {
+        window.addEventListener("load", function () {
             const searchBox = document.getElementById('searchBox');
             const suggestionBox = document.getElementById('suggestionBox');
             searchBox.addEventListener("input", async () => {
                 const query = searchBox.value.trim();
-                if(query.length > 0){
-                    const response = await fetch(`/WorkSetup?searchKey=${encodeURIComponent(query)}`);
-                    if(!response.ok){
-                        console.log("not");
-                    }
-
-                    const data = response.json();
-                    suggestionBox.innerHTML = "";
-                    if(data.length > 0){
-                        data.forEach(item => {
-                            suggestionBox.innerHTML += `<a href="/WorkSetup/Details/${item.workSetupId}" class="list-group-item list-group-item-action">${item.workSetupName}</a>`;
-                        });
-                    } else {
-                        suggestionBox.innerHTML = '<div class="list-group-item">No results found</div>';
+                if (query.length > 0) {
+                    try {
+                        const response = await fetch(`/WorkSetup?searchKey=${encodeURIComponent(query)}&json=true`);
+                        const contentType = response.headers.get("content-type");
+                        if (!response.ok) {
+                            throw new Error("Network response was not ok");
+                        }
+                        const data = await response.json();
+                        suggestionBox.innerHTML = "";
+                        if (data.setups && data.setups.length > 0) {
+                            data.setups.forEach(item => {
+                                suggestionBox.innerHTML += `<li class="my-1 px-2"><a href="/WorkSetup/${item.workSetupId}" class="text-decoration-none text-body">
+                                            ${item.workSetupName}
+                                        </a></li>`;
+                            });
+                        } else {
+                            suggestionBox.innerHTML = '<div class="list-group-item">No results found</div>';
+                        }
+                    } catch (error) {
+                        console.error("Error fetching search results:", error);
+                        suggestionBox.innerHTML = '<div class="list-group-item text-danger">Error fetching search results</div>';
                     }
 
                 } else {
-                    suggestionBox.innerHTML = ''; // Clear suggestion box if query is empty
+                    suggestionBox.innerHTML = ""; // Clear suggestion box if query is empty
                 }
             });
-        }
+        });
     </script>
 }
 
