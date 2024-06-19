@@ -1,10 +1,12 @@
 ﻿using Machine_Setup_Worksheet.Models;
+using Machine_Setup_Worksheet.Models.DTOs;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Machine = Machine_Setup_Worksheet.Models.Machine;
 
 namespace Machine_Setup_Worksheet.Data
 {
-    public class ApplicationDbContext : DbContext
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser,ApplicationRole,Guid>
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {

@@ -37,10 +37,18 @@
                             </ul>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <button class="btn btn-outline-success mx-1" type="button">Login</button>
-                        <button class="btn btn-outline-success mx-1" type="button">Register</button>
+                    @if (!User.Identity.IsAuthenticated)
+                    {
+                        <div class="d-flex">
+                            <a asp-action="Login" asp-controller="Account" class="btn btn-outline-success mx-1" type="button">Login</a>
+                            <a asp-action="Register" asp-controller="Account" class="btn btn-outline-success mx-1" type="button">Register</a>
+                        </div>
+                    }else{
+                    <form asp-action="Logout" asp-controller="Account" class="d-flex">
+                        <button class="btn btn-outline-success mx-1" type="submit">Logout</button>
                     </form>
+                    }
+
                 </div>
             </div>
         </nav>
@@ -48,7 +56,7 @@
     <div class="container">
         @RenderBody()
     </div>
-    <footer class="footer">
+    <footer class="footer mt-2">
         <div class="container">
             <p class="footer-text">© 2024 Rahi Patel - All rights reserved</p>
         </div>

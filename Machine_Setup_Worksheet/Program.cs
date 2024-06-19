@@ -1,8 +1,12 @@
 using Machine_Setup_Worksheet.Data;
+using Machine_Setup_Worksheet.Models;
+using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Repositories;
 using Machine_Setup_Worksheet.Repositories.IRepository;
 using Machine_Setup_Worksheet.Services;
 using Machine_Setup_Worksheet.Services.IServices;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +16,11 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
 });
 
+// enable identity in application
+builder.Services.AddIdentity<ApplicationUser, ApplicationRole>().AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders()
+    .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
+    .AddRoleStore<RoleStore<ApplicationRole,ApplicationDbContext,Guid>>();
 // DI for all repository
 builder.Services.AddScoped<IJawRepository, JawRepository>();
 builder.Services.AddScoped<IMachineRepository, MachineRepository>();
