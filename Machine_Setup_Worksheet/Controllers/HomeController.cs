@@ -1,5 +1,6 @@
 ﻿using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Machine_Setup_Worksheet.Controllers
@@ -15,6 +16,21 @@ namespace Machine_Setup_Worksheet.Controllers
 
         [HttpGet("/")]
         public IActionResult Index()
+        {
+            return View();
+        }
+
+
+        [HttpGet("/error")]
+        [AllowAnonymous]
+        public IActionResult Error()
+        {
+            return View();
+        }
+
+        [HttpGet("/status/403")]
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
         {
             return View();
         }

@@ -20,5 +20,8 @@ namespace Machine_Setup_Worksheet.Models.DTOs
         [Compare("Password", ErrorMessage = "passwords are not matching")]
         public string? ConfirmPassword { get; set; }
 
+        [Required(ErrorMessage = "Please select Role")]
+        public string? Role {  get; set; }
+
     }
 }

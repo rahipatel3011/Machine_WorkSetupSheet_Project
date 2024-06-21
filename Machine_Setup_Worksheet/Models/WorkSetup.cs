@@ -18,9 +18,9 @@ namespace Machine_Setup_Worksheet.Models
         public ICollection<Setup>? Setups { get; set; }
 
         public string? Note { get; set; }
-        //public Guid MachineId { get; set; }
-        //[ForeignKey("MachineId")]
-        //public Machine? machine { get; set; }
+        public Guid MachineId { get; set; }
+        [ForeignKey("MachineId")]
+        public Machine? machine { get; set; }
 
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Machine_Setup_Worksheet.Controllers
@@ -17,14 +18,9 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            try
-            {
+            
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 return View(jaws);
-            }catch (Exception ex)
-            {
-                return StatusCode(500, "an Error Occured while fetching all jaws");
-            }
         }
 
 
@@ -32,25 +28,17 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet("create")]
         public async Task<IActionResult> Create()
         {
-            try
-            {
+            
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 ViewBag.Open = true;
                 return View("Index", jaws);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "an Error occured while loading cretae jaw page");
-            }
         }
 
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm]JawsDTO jawsDTO)
         {
-            try
-            {
-                ViewBag.Open = true;
+            ViewBag.Open = true;
                 if (!ModelState.IsValid)
                 {
                     IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
@@ -60,18 +48,13 @@ namespace Machine_Setup_Worksheet.Controllers
 
                 await _jawService.SaveJaw(jawsDTO);
                 return RedirectToAction("Index");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "an Error Occured while creating a jaw");
-            }
+            
         }
 
         [HttpGet("edit/{JawId}")]
         public async Task<IActionResult> EditJaw([FromRoute]Guid? JawId)
         {
-            try
-            {
+            
                 if (JawId == null)
                 {
                     return RedirectToAction("Index", "Jaws");
@@ -79,19 +62,14 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(JawId.Value, "Save");
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 return View("Index", jaws);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "an Error occured while loading edit jaw page");
-            }
+            
         }
 
 
         [HttpGet("delete/{JawId}")]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? JawId)
         {
-            try
-            {
+            
                 if (JawId == null)
                 {
                     return RedirectToAction("Index", "Jaws");
@@ -99,18 +77,13 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(JawId.Value, "Delete");
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 return View("Index", jaws);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(401, "an Error occured while loading delete jaw page");
-            }
+            
         }
 
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteJaw([FromForm] Guid JawId)
         {
-            try
-            {
+            
                 int affectedRow = await _jawService.DeleteJaw(JawId);
                 if (affectedRow > 0)
                 {
@@ -121,11 +94,7 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(JawId, "Delete");
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 return View("Index", jaws);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(401, "an Error occured while deleting a jaw");
-            }
+            
         }
 
         private async Task SetViewBag(Guid JawId, string SaveOrDeleteModal)

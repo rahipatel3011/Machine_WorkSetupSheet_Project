@@ -27,8 +27,7 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet("create")]
         public async Task<IActionResult> Create([FromRoute] Guid id)
         {
-            try
-            {
+            
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 ViewBag.Jaws = jaws.Select(jaw =>
                 {
@@ -38,18 +37,13 @@ namespace Machine_Setup_Worksheet.Controllers
                 SetupDTO setupDTO = new SetupDTO() { WorkSetupId = id, SetupNumber = 1 };
 
                 return View("Create", setupDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while loading create setup page");
-            }
+            
         }
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm]SetupDTO setupDTO)
         {
-            try
-            {
+            
                 if (!ModelState.IsValid)
                 {
                     ViewBag.Errors = ModelState.Values.SelectMany(u => u.Errors).Select(error => error.ErrorMessage);
@@ -71,19 +65,14 @@ namespace Machine_Setup_Worksheet.Controllers
 
                 await _setupService.SaveSetup(setupDTO);
                 return RedirectToAction("Detail", "WorkSetup", new { id = setupDTO.WorkSetupId });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while creating a setup");
-            }
+           
         }
 
 
         [HttpGet("{setupId:Guid}")]
         public async Task<IActionResult> Update([FromRoute] Guid setupId)
         {
-            try
-            {
+            
                 IEnumerable<JawsDTO> jaws = await _jawService.GetAllJaws();
                 ViewBag.Jaws = jaws.Select(jaw =>
                 {
@@ -94,19 +83,14 @@ namespace Machine_Setup_Worksheet.Controllers
 
 
                 return View(setupDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "an Error occured while loading update setup page");
-            }
+            
         }
 
 
         [HttpPost("{setupId:Guid}")]
         public async Task<IActionResult> Update([FromForm] SetupDTO setupDTO)
         {
-            try
-            {
+            
                 if (!ModelState.IsValid)
                 {
                     ViewBag.Errors = ModelState.Values.SelectMany(u => u.Errors).Select(error => error.ErrorMessage);
@@ -141,11 +125,7 @@ namespace Machine_Setup_Worksheet.Controllers
                 DeleteImageFromRoot(fullPath);
 
                 return RedirectToAction("Detail", "WorkSetup", new { id = setupDTO.WorkSetupId });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(400, "an Error occured while updating setup");
-            }
+            
         }
 
 
@@ -154,26 +134,20 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpPost("delete")]
         public async Task<IActionResult> Delete([FromForm]SetupDTO setupDTO)
         {
-            try
-            {
+            
                 JawsDTO jaw = await _jawService.GetJawById(setupDTO.JawId);
                 setupDTO.Jaw = jaw;
                 ViewBag.isDeleteModal = true;
                 //ViewBag.setup = setupDTO; // need it in ViewComponent'View to display setupId
                 return View(setupDTO);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while loading delete setup page");
-            }
+           
         }
 
 
         [HttpPost("delete/{setupId:Guid}")]
         public async Task<IActionResult> Delete([FromRoute] Guid setupId)
         {
-            try
-            {
+            
                 // getting setupDTO to get imageUrl and delete it from Root
                 SetupDTO dbSetupDTO = await _setupService.GetBySetupIdAsync(setupId);
                 string imageFullPath = Path.Combine(_webHostEnvironment.WebRootPath, dbSetupDTO.SetupImage.TrimStart('/'));
@@ -186,11 +160,7 @@ namespace Machine_Setup_Worksheet.Controllers
                 }
                 DeleteImageFromRoot(imageFullPath);
                 return RedirectToAction("Detail", "WorkSetup", new { Id = dbSetupDTO.WorkSetupId });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while deleting a setup");
-            }
+            
         }
 
 

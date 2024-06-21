@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Machine_Setup_Worksheet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240619002951_addedIdentity")]
-    partial class addedIdentity
+    [Migration("20240621013948_MachineAddToWorkSetup")]
+    partial class MachineAddToWorkSetup
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -140,7 +140,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            JawId = new Guid("b9024dcb-a3fe-4ac1-bafd-fa8fbd59a700"),
+                            JawId = new Guid("57d8ed55-77bc-4f9c-9f03-721606e6335e"),
                             JawName = "Hard Jaws"
                         });
                 });
@@ -162,7 +162,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            MachineId = new Guid("1893b80f-3105-4572-815e-35933fae3f1b"),
+                            MachineId = new Guid("357a6353-e064-4b78-8c68-ae5b44c070d4"),
                             MachineName = "Hwacheon"
                         });
                 });
@@ -212,6 +212,9 @@ namespace Machine_Setup_Worksheet.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<Guid>("MachineId")
+                        .HasColumnType("uniqueidentifier");
+
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(max)");
 
@@ -223,6 +226,8 @@ namespace Machine_Setup_Worksheet.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("WorkSetupId");
+
+                    b.HasIndex("MachineId");
 
                     b.ToTable("WorkSetups");
                 });
@@ -347,6 +352,17 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.Navigation("Jaw");
 
                     b.Navigation("WorkSetup");
+                });
+
+            modelBuilder.Entity("Machine_Setup_Worksheet.Models.WorkSetup", b =>
+                {
+                    b.HasOne("Machine_Setup_Worksheet.Models.Machine", "machine")
+                        .WithMany()
+                        .HasForeignKey("MachineId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("machine");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

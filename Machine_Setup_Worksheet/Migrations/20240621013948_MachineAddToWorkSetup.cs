@@ -6,21 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Machine_Setup_Worksheet.Migrations
 {
     /// <inheritdoc />
-    public partial class addedIdentity : Migration
+    public partial class MachineAddToWorkSetup : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.DeleteData(
-                table: "Jaws",
-                keyColumn: "JawId",
-                keyValue: new Guid("bab2d697-bef4-4db9-b065-1bf441e7ce7a"));
-
-            migrationBuilder.DeleteData(
-                table: "Machines",
-                keyColumn: "MachineId",
-                keyValue: new Guid("eb691098-dee4-430b-b2e9-871a8002b941"));
-
             migrationBuilder.CreateTable(
                 name: "AspNetRoles",
                 columns: table => new
@@ -59,6 +49,30 @@ namespace Machine_Setup_Worksheet.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Jaws",
+                columns: table => new
+                {
+                    JawId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    JawName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Jaws", x => x.JawId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Machines",
+                columns: table => new
+                {
+                    MachineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    MachineName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Machines", x => x.MachineId);
                 });
 
             migrationBuilder.CreateTable(
@@ -167,15 +181,66 @@ namespace Machine_Setup_Worksheet.Migrations
                         onDelete: ReferentialAction.Cascade);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "WorkSetups",
+                columns: table => new
+                {
+                    WorkSetupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    WorkSetupName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    WorkSetupCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    CompanyName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Note = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    MachineId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_WorkSetups", x => x.WorkSetupId);
+                    table.ForeignKey(
+                        name: "FK_WorkSetups_Machines_MachineId",
+                        column: x => x.MachineId,
+                        principalTable: "Machines",
+                        principalColumn: "MachineId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Setups",
+                columns: table => new
+                {
+                    SetupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    SetupNumber = table.Column<int>(type: "int", nullable: false),
+                    JawId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
+                    Toothinfo = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    SetupImage = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    MaterialSize = table.Column<double>(type: "float", nullable: false),
+                    WorkSetupId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Setups", x => x.SetupId);
+                    table.ForeignKey(
+                        name: "FK_Setups_Jaws_JawId",
+                        column: x => x.JawId,
+                        principalTable: "Jaws",
+                        principalColumn: "JawId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Setups_WorkSetups_WorkSetupId",
+                        column: x => x.WorkSetupId,
+                        principalTable: "WorkSetups",
+                        principalColumn: "WorkSetupId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
             migrationBuilder.InsertData(
                 table: "Jaws",
                 columns: new[] { "JawId", "JawName" },
-                values: new object[] { new Guid("b9024dcb-a3fe-4ac1-bafd-fa8fbd59a700"), "Hard Jaws" });
+                values: new object[] { new Guid("57d8ed55-77bc-4f9c-9f03-721606e6335e"), "Hard Jaws" });
 
             migrationBuilder.InsertData(
                 table: "Machines",
                 columns: new[] { "MachineId", "MachineName" },
-                values: new object[] { new Guid("1893b80f-3105-4572-815e-35933fae3f1b"), "Hwacheon" });
+                values: new object[] { new Guid("357a6353-e064-4b78-8c68-ae5b44c070d4"), "Hwacheon" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -215,6 +280,21 @@ namespace Machine_Setup_Worksheet.Migrations
                 column: "NormalizedUserName",
                 unique: true,
                 filter: "[NormalizedUserName] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Setups_JawId",
+                table: "Setups",
+                column: "JawId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Setups_WorkSetupId",
+                table: "Setups",
+                column: "WorkSetupId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_WorkSetups_MachineId",
+                table: "WorkSetups",
+                column: "MachineId");
         }
 
         /// <inheritdoc />
@@ -236,30 +316,22 @@ namespace Machine_Setup_Worksheet.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
+                name: "Setups");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");
 
-            migrationBuilder.DeleteData(
-                table: "Jaws",
-                keyColumn: "JawId",
-                keyValue: new Guid("b9024dcb-a3fe-4ac1-bafd-fa8fbd59a700"));
+            migrationBuilder.DropTable(
+                name: "Jaws");
 
-            migrationBuilder.DeleteData(
-                table: "Machines",
-                keyColumn: "MachineId",
-                keyValue: new Guid("1893b80f-3105-4572-815e-35933fae3f1b"));
+            migrationBuilder.DropTable(
+                name: "WorkSetups");
 
-            migrationBuilder.InsertData(
-                table: "Jaws",
-                columns: new[] { "JawId", "JawName" },
-                values: new object[] { new Guid("bab2d697-bef4-4db9-b065-1bf441e7ce7a"), "Hard Jaws" });
-
-            migrationBuilder.InsertData(
-                table: "Machines",
-                columns: new[] { "MachineId", "MachineName" },
-                values: new object[] { new Guid("eb691098-dee4-430b-b2e9-871a8002b941"), "Hwacheon" });
+            migrationBuilder.DropTable(
+                name: "Machines");
         }
     }
 }

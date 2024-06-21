@@ -27,7 +27,7 @@
             </ul>
         }
         <div class="card-body">
-            <form asp-action="Login" asp-asp-controller="Account" method="post" class="registration-form">
+            <form asp-action="Login" asp-controller="Account" asp-route-ReturnUrl="@Context.Request.Query["ReturnUrl"]" method="post" class="registration-form">
                 
                 <div class="mb-3">
                     <label asp-for="Email" class="form-label"></label>

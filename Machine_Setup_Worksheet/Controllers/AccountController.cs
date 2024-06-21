@@ -1,6 +1,8 @@
 ﻿using Machine_Setup_Worksheet.Data;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
+using Machine_Setup_Worksheet.Services.IServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,21 +10,17 @@ namespace Machine_Setup_Worksheet.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
+        private readonly IUserService _userService;
 
-        public AccountController(UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager) {
 
-            _userManager = userManager;
-            _signInManager = signInManager;
-        }
-
-        public IActionResult Index()
+        public AccountController(IUserService userService)
         {
-            return View();
+            _userService = userService;
         }
+
 
         [HttpGet("/register")]
+        [AllowAnonymous]
         public IActionResult Register()
         {
             if (User.Identity.IsAuthenticated)
@@ -41,27 +39,17 @@ namespace Machine_Setup_Worksheet.Controllers
                 return View(registerDTO);
             }
 
-            ApplicationUser user = new ApplicationUser()
+            IdentityResult identityResult = await _userService.CreateUserAsync(registerDTO);
+            if (identityResult.Succeeded)
             {
-                Name = registerDTO.Name,
-                Email = registerDTO.Email,
-                UserName = registerDTO.Email
-            };
-            if (registerDTO.Password != null)
-            {
-                IdentityResult identityResult = await _userManager.CreateAsync(user, registerDTO.Password);
-                if (identityResult.Succeeded)
-                {
-                    return RedirectToAction(nameof(HomeController.Index), "Home");
-                }
-                ViewBag.Register = identityResult.Errors.Select(u=>u.Description).ToList();
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-            
+            ViewBag.Register = identityResult.Errors.Select(u=>u.Description).ToList();
             return View(registerDTO);
         }
 
-
         [HttpGet("/login")]
+        [AllowAnonymous]
         public IActionResult Login()
         {
             if (User.Identity.IsAuthenticated)
@@ -71,9 +59,9 @@ namespace Machine_Setup_Worksheet.Controllers
             return View();
         }
 
-
         [HttpPost("/login")]
-        public async Task<IActionResult> Login([FromForm] LoginDTO loginDTO)
+        [AllowAnonymous]
+        public async Task<IActionResult> Login([FromForm] LoginDTO loginDTO, [FromQuery]string? ReturnUrl)
         {
             if (!ModelState.IsValid)
             {
@@ -81,29 +69,16 @@ namespace Machine_Setup_Worksheet.Controllers
                 return View(loginDTO);
             }
 
-            if (loginDTO.Password != null)
+            bool isLoggedIn = await _userService.LoginUserAsync(loginDTO);
+            if(isLoggedIn)
             {
-                ApplicationUser? applicationUser = await _userManager.FindByEmailAsync(loginDTO.Email);
-                if(applicationUser != null)
+                if(!String.IsNullOrWhiteSpace(ReturnUrl))
                 {
-                    bool isCreadentialTrue = await _userManager.CheckPasswordAsync(applicationUser, loginDTO.Password);
-                    if(isCreadentialTrue)
-                    {
-                        await _signInManager.SignInAsync(applicationUser, false);
-                        return RedirectToAction(nameof(HomeController.Index), "Home");
-                    }
-                    else
-                    {
-                        ViewBag.Login = new[] { "Invalid Password" }.ToList();
-                    }
+                    return LocalRedirect(ReturnUrl);
                 }
-                else
-                {
-                    ViewBag.Login = new[] { "Invalid Email Address" }.ToList();
-                }
-                
+                return RedirectToAction(nameof(HomeController.Index), "Home");
             }
-
+            ViewBag.Login = new[] { "Invalid Creadentials" }.ToList();
             return View(loginDTO);
         }
 
@@ -112,7 +87,7 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpPost("/logout")]
         public async Task<IActionResult> Logout() 
         {
-            await _signInManager.SignOutAsync();
+            await _userService.LogoutUserAsync();
             return RedirectToAction(nameof(HomeController.Index), "Home");
         }
     }

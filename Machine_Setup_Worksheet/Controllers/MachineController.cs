@@ -19,39 +19,27 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
-            try
-            {
+            
                 IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
                 return View(machines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while fetching all machines");
-            }
+            
         }
 
 
         [HttpGet("create")]
         public async Task<IActionResult> Create()
         {
-            try
-            {
-                IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
+               IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
                 ViewBag.Open = true;
                 return View("Index", machines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while loading create machine page");
-            }
+            
         }
 
 
         [HttpPost("create")]
         public async Task<IActionResult> Create([FromForm] MachineDTO machineDTO)
         {
-            try
-            {
+            
                 ViewBag.Open = true;
                 if (!ModelState.IsValid)
                 {
@@ -62,19 +50,14 @@ namespace Machine_Setup_Worksheet.Controllers
                 await _machineService.SaveMachine(machineDTO);
 
                 return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while saving a machine");
-            }
+            
         }
 
 
         [HttpGet("edit/{MachineId}")]
         public async Task<IActionResult> EditMachine([FromRoute] Guid? MachineId)
         {
-            try
-            {
+           
                 if (MachineId == null)
                 {
                     return RedirectToAction(nameof(Index), nameof(JawsController));
@@ -82,19 +65,14 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(MachineId.Value, "Save");
                 IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
                 return View("Index", machines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while loading edit machine page");
-            }
+            
         }
 
 
         [HttpGet("delete/{MachineId}")]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? MachineId)
         {
-            try
-            {
+            
                 if (MachineId == null)
                 {
                     return RedirectToAction("Index", "Machine");
@@ -102,18 +80,13 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(MachineId.Value, "Delete");
                 IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
                 return View("Index", machines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while loading a delete machine page");
-            }
+            
         }
 
         [HttpPost("delete")]
         public async Task<IActionResult> DeleteMachine([FromForm] Guid MachineId)
         {
-            try
-            {
+            
                 int affectedRow = await _machineService.DeleteMachine(MachineId);
                 if (affectedRow > 0)
                 {
@@ -124,11 +97,7 @@ namespace Machine_Setup_Worksheet.Controllers
                 await SetViewBag(MachineId, "Delete");
                 IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
                 return View("Index", machines);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "an Error occured while deleting a machine");
-            }
+            
         }
 
 
