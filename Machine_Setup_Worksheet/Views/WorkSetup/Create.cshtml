@@ -32,6 +32,15 @@
                             <input type="text" class="form-control" asp-for="CompanyName" placeholder="Enter Company Name">
                             <span asp-validation-for="CompanyName" class="text-danger"></span>
                         </div>
+
+
+                        <div class="input-group mb-3">
+                            <label asp-for="MachineId" class="input-group-text">Machines</label>
+                            <select asp-for="MachineId" asp-items="@ViewBag.Machine" class="form-select">
+                                <option selected disabled>please select machine</option>
+                            </select>
+                        </div>
+
                         <div class="mb-3">
                             <label for="Note" class="form-label">Note</label>
                             <textarea class="form-control" asp-for="Note" placeholder="Enter any notes"></textarea>

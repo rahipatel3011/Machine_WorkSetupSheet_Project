@@ -31,7 +31,7 @@ namespace Machine_Setup_Worksheet.Repositories
         {
             try
             {
-                return await _db.WorkSetups.Include(temp => temp.Setups).ThenInclude(temp => temp.Jaw).FirstAsync(workSetup => workSetup.WorkSetupId == id);
+                return await _db.WorkSetups.Include(temp => temp.Setups).ThenInclude(temp => temp.Jaw).Include(temp=>temp.machine).FirstAsync(workSetup => workSetup.WorkSetupId == id);
             }
             catch (Exception ex)
             {

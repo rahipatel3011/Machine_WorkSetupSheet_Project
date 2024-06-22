@@ -1,5 +1,4 @@
-﻿using Machine_Setup_Worksheet.Controllers;
-using Machine_Setup_Worksheet.CustomExceptions;
+﻿using Machine_Setup_Worksheet.CustomExceptions;
 using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
@@ -21,6 +20,16 @@ namespace Machine_Setup_Worksheet.Services
             _signInManager = signInManager;
             _roleManager = roleManager;
         }
+
+
+
+
+        /// <summary>
+        /// Create Application User
+        /// </summary>
+        /// <param name="registerDTO">registerDTO</param>
+        /// <returns>IdentityResult</returns>
+        /// <exception cref="ServiceException">ServiceException</exception>
         public async Task<IdentityResult> CreateUserAsync(RegisterDTO registerDTO)
         {
             try
@@ -42,7 +51,12 @@ namespace Machine_Setup_Worksheet.Services
 
 
 
-
+        /// <summary>
+        /// Login Application User
+        /// </summary>
+        /// <param name="loginDTO">loginDTO</param>
+        /// <returns>True/False</returns>
+        /// <exception cref="ServiceException">ServiceException</exception>
         public async Task<bool> LoginUserAsync(LoginDTO loginDTO)
         {
             try
@@ -66,9 +80,49 @@ namespace Machine_Setup_Worksheet.Services
             }
         }
 
+
+
+        /// <summary>
+        /// Logout User
+        /// </summary>
+        /// <returns>void</returns>
         public async Task LogoutUserAsync()
         {
             await _signInManager.SignOutAsync();
+        }
+
+
+
+
+        /// <summary>
+        /// Assign as role to specific user with given emailId
+        /// </summary>
+        /// <param name="email">mail Address</param>
+        /// <param name="roleName">Role Name</param>
+        /// <returns>IdentityResult</returns>
+        /// <exception cref="ServiceException">ServiceException</exception>
+        public async Task<IdentityResult> AssignRoleAsync(string email, string roleName)
+        {
+            try
+            {
+                ApplicationRole? applicationRole = await _roleManager.FindByNameAsync(roleName);
+                if (applicationRole == null)
+                {
+                    //create role
+                    ApplicationRole createdApplicationRole = new ApplicationRole() { Name = roleName };
+                    IdentityResult identityResult = await _roleManager.CreateAsync(createdApplicationRole);
+                    if (!identityResult.Succeeded)
+                    {
+                        return identityResult;
+                    }
+                }
+                ApplicationUser? user = await _userManager.FindByEmailAsync(email);
+                IdentityResult identityResultAfterCreatingRole = await _userManager.AddToRoleAsync(user, roleName);
+                return identityResultAfterCreatingRole;
+            }catch (Exception ex)
+            {
+                throw new ServiceException("Error while assigning a role", ex);
+            }
         }
     }
 }
