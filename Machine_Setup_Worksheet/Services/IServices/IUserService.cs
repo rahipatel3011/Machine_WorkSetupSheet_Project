@@ -36,5 +36,7 @@ namespace Machine_Setup_Worksheet.Services.IServices
         /// <param name="roleName">Role Name</param>
         /// <returns>IdentityResult</returns>
         Task<IdentityResult> AssignRoleAsync(string email, string roleName);
+
+
     }
 }

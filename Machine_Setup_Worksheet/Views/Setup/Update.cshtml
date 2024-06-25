@@ -48,9 +48,20 @@
                                     <span asp-validation-for="Toothinfo" class="text-danger"></span>
                                 </div>
 
-                                <div class="mb-3">
-                                    <label for="MaterialSize" class="form-label">Material Size</label>
-                                    <input type="number" class="form-control" asp-for="MaterialSize" placeholder="Enter Material Size">
+                                <div class="mb-3 ">
+                                    <div class="d-flex">
+                                        <label for="MaterialSize" class="form-label w-25">Material Size</label>
+                                        <input type="number" class="form-control w-25" asp-for="MaterialSize" placeholder="Enter Material Size">
+                                        <select asp-for="MeasurementUnit" class="form-select w-25" aria-label="Unit">
+                                            <option selected value="inches">inches</option>
+                                            <option value="mm">mm</option>
+                                        </select>
+
+                                        <select asp-for="MaterialShape" class="form-select w-25" aria-label="Unit">
+                                            <option selected value="Round">Round</option>
+                                            <option value="Hex">Hex</option>
+                                        </select>
+                                    </div>
                                     <span asp-validation-for="MaterialSize" class="text-danger"></span>
                                 </div>
 

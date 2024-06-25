@@ -3,6 +3,8 @@ using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 
 namespace Machine_Setup_Worksheet.Services
 {
@@ -38,7 +40,7 @@ namespace Machine_Setup_Worksheet.Services
                 {
                     Name = registerDTO.Name,
                     Email = registerDTO.Email,
-                    UserName = registerDTO.Email,
+                    UserName = registerDTO.Email.Split("@")[0],
                 };
 
                 IdentityResult identityResult = await _userManager.CreateAsync(user, registerDTO.Password);
@@ -124,5 +126,8 @@ namespace Machine_Setup_Worksheet.Services
                 throw new ServiceException("Error while assigning a role", ex);
             }
         }
+
+
+        
     }
 }

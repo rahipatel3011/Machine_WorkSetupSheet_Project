@@ -1,5 +1,7 @@
-﻿using Machine_Setup_Worksheet.Models.DTOs;
+﻿using Machine_Setup_Worksheet.Attributes;
+using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
+using Machine_Setup_Worksheet.Utility;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -77,6 +79,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// </summary>
         /// <returns>Returns the create view for WorkSetup.</returns>
         [HttpGet("Create")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> Create()
         {
             IEnumerable<MachineDTO> machines = await _machineService.GetAllMachines();
@@ -95,6 +98,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="workSetupDTO">Data of the WorkSetup to save.</param>
         /// <returns>Returns a redirect to the index action if save is successful; otherwise, returns to the create form with errors.</returns>
         [HttpPost("Save")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Save(WorkSetupDTO workSetupDTO)
         {
@@ -116,6 +120,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="Id">ID of the WorkSetup to update.</param>
         /// <returns>Returns the create view pre-filled with data of the specified WorkSetup.</returns>
         [HttpGet("update/{Id:Guid}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> Update(Guid Id)
         {
             WorkSetupDTO workSetupDTO = await _workSetupService.GetWorkSetupByIdAsync(Id);
@@ -136,6 +141,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="workSetupDTO1">Unused parameter.</param>
         /// <returns>Returns the detail view with delete confirmation dialog for the specified WorkSetup.</returns>
         [HttpGet("delete/{Id:Guid}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> Delete(Guid Id, WorkSetupDTO workSetupDTO1)
         {
             WorkSetupDTO workSetupDTO = await _workSetupService.GetWorkSetupByIdAsync(Id);
@@ -156,6 +162,8 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="WorkSetupId">ID of the WorkSetup to delete.</param>
         /// <returns>Returns a redirect to the index action if deletion is successful.</returns>
         [HttpPost("delete/{Id:Guid}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete([FromForm] Guid WorkSetupId)
         {
             await _workSetupService.DeleteWorkSetup(WorkSetupId);

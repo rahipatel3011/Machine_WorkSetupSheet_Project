@@ -14,16 +14,20 @@
 
 <div class="w-75 mx-auto">
 <h1 class="my-4 text-center">Jaws Management</h1>
-<div class="d-flex justify-content-end mb-3">
-    <a class="btn btn-primary" id="createButton" href="/jaws/create">Create Jaw</a>
-        @* asp-action="Create" asp-controller="Jaws" *@
-</div>
+@if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString())){
+    <div class="d-flex justify-content-end mb-3">
+        <a class="btn btn-primary" id="createButton" href="/jaws/create">Create Jaw</a>
+    </div>
+}
 
 <table class="table table-bordered">
     <thead class="thead-dark">
         <tr>
             <th scope="col" class="jaws-name">Jaws Name</th>
-            <th scope="col" class="jaws-action">Actions</th>
+                @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                {
+                    <th scope="col" class="jaws-action">Actions</th>
+                }
         </tr>
     </thead>
     <tbody>
@@ -32,10 +36,12 @@
             {
             <tr>
             <td>@jaw.JawName</td>
-            <td>
-                <a class="btn btn-warning btn-sm me-2" href="/jaws/edit/@jaw.JawId" id="updateButton">Edit</a>
-                <a class="btn btn-danger btn-sm" href="/jaws/delete/@jaw.JawId"  id="deleteButton">Delete</a>
-            </td>
+            @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString())){
+                <td>
+                    <a class="btn btn-warning btn-sm me-2" href="/jaws/edit/@jaw.JawId" id="updateButton">Edit</a>
+                    <a class="btn btn-danger btn-sm" href="/jaws/delete/@jaw.JawId"  id="deleteButton">Delete</a>
+                </td>
+            }
         </tr>
         }
         <!-- Add more rows as needed -->

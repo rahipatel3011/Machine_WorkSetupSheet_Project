@@ -9,6 +9,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Machine_Setup_Worksheet.Attributes;
+using Machine_Setup_Worksheet.Utility;
 
 namespace Machine_Setup_Worksheet.Controllers
 {
@@ -16,6 +18,7 @@ namespace Machine_Setup_Worksheet.Controllers
     /// Controller responsible for managing Setups associated with a WorkSetup.
     /// </summary>
     [Route("/setup/{id:Guid}")]
+    [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
     public class SetupController : Controller
     {
         private readonly IWebHostEnvironment _webHostEnvironment;
@@ -72,6 +75,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="setupDTO">Data of the Setup to create.</param>
         /// <returns>Returns a redirect to the Detail action of WorkSetup if creation is successful; otherwise, returns to the create form with errors.</returns>
         [HttpPost("create")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] SetupDTO setupDTO)
         {
             if (!ModelState.IsValid)
@@ -124,6 +128,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="setupDTO">Data of the Setup to update.</param>
         /// <returns>Returns a redirect to the Detail action of WorkSetup if update is successful; otherwise, returns to the update form with errors.</returns>
         [HttpPost("{setupId:Guid}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Update([FromForm] SetupDTO setupDTO)
         {
             if (!ModelState.IsValid)
@@ -163,6 +168,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="setupDTO">Data of the Setup to delete.</param>
         /// <returns>Returns a view with the delete confirmation dialog for the specified Setup.</returns>
         [HttpPost("delete")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete([FromForm] SetupDTO setupDTO)
         {
             JawsDTO jaw = await _jawService.GetJawById(setupDTO.JawId);
@@ -178,6 +184,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="setupId">ID of the Setup to delete.</param>
         /// <returns>Returns a redirect to the Detail action of WorkSetup if deletion is successful; otherwise, returns to the delete confirmation view with errors.</returns>
         [HttpPost("delete/{setupId:Guid}")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Delete([FromRoute] Guid setupId)
         {
             // Get setupDTO to get imageUrl and delete it from Root

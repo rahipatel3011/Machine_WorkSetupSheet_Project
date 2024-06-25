@@ -18,80 +18,98 @@
                 <h2 class="text-center">@Model.machine.MachineName</h2>
                 <div class="card-body">
                     <div class="row">
-                        @foreach (SetupDTO setup in Model.Setups)
+                        @if(Model.Setups.Count <= 0)
                         {
-                            <form action="/setup/@setup.WorkSetupId/delete" method="post">
-                                <input type="hidden" name="SetupId" value="@setup.SetupId" />
-                                <input type="hidden" name="SetupNumber" value="@setup.SetupNumber" />
-                                <input type="hidden" name="JawId" value="@setup.JawId" />
-                                <input type="hidden" name="Jaw" value="@setup.Jaw?.JawName" />
-                                <input type="hidden" name="Toothinfo" value="@setup.Toothinfo" />
-                                <input type="hidden" name="SetupImage" value="@setup.SetupImage" />
-                                <input type="hidden" name="ImageUrl" value="@setup.ImageUrl" />
-                                <input type="hidden" name="MaterialSize" value="@setup.MaterialSize" />
-                                <input type="hidden" name="WorkSetupId" value="@Model.WorkSetupId" />
-                                <input type="hidden" name="SetupId" value="@setup.SetupId"/>
+                            <p class="text-center"> No infomation available</p>
+                        }else{
+                            @foreach (SetupDTO setup in Model.Setups)
+                            {
+                                <form action="/setup/@setup.WorkSetupId/delete" method="post">
+                                    @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                                    {
+                                        <input type="hidden" name="SetupId" value="@setup.SetupId" />
+                                        <input type="hidden" name="SetupNumber" value="@setup.SetupNumber" />
+                                        <input type="hidden" name="JawId" value="@setup.JawId" />
+                                        <input type="hidden" name="Jaw" value="@setup.Jaw?.JawName" />
+                                        <input type="hidden" name="Toothinfo" value="@setup.Toothinfo" />
+                                        <input type="hidden" name="SetupImage" value="@setup.SetupImage" />
+                                        <input type="hidden" name="ImageUrl" value="@setup.ImageUrl" />
+                                        <input type="hidden" name="MaterialSize" value="@setup.MaterialSize" />
+                                        <input type="hidden" name="WorkSetupId" value="@Model.WorkSetupId" />
+                                        <input type="hidden" name="SetupId" value="@setup.SetupId" />
+                                    }
 
-                            <div class="col-md-12 mb-4">
-                                    <div class="card shadow setup-card">
+                                    <div class="col-md-12 mb-4">
+                                        <div class="card shadow setup-card">
 
-                                        <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
-                                            <h5 class="mb-0">Setup #@setup.SetupNumber</h5>
-                                            <div>
+                                            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                                                <h5 class="mb-0">Setup #@setup.SetupNumber</h5>
+                                                @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                                                {
+                                                    <div>
 
-                                                @* Edit Button *@
-                                                <a href="@Url.Action("Update", "Setup", new { setupId=setup.SetupId ,id= setup.WorkSetupId })" class="text-decoration-none text-dark me-2">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
-                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
-                                            </svg>
-                                            </a>
+                                                        @* Edit Button *@
+                                                        <a href="@Url.Action("Update", "Setup", new { setupId=setup.SetupId ,id= setup.WorkSetupId })" class="text-decoration-none text-dark me-2">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z" />
+                                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z" />
+                                                            </svg>
+                                                        </a>
 
 
-                                            @*Remove Cross button*@
-                                            <button type="submit" style="vertical-align: 0" class="btn p-0 border-0 bg-transparent text-danger">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
-                                                    <path fill="#9E2E2E" stroke="#9E2E2E" stroke-width="1.5" d="M3.646 3.646a.75.75 0 0 1 1.061 0L8 7.293l3.293-3.647a.75.75 0 0 1 1.061 1.061L9.061 8l3.293 3.646a.75.75 0 1 1-1.061 1.061L8 9.061l-3.293 3.647a.75.75 0 1 1-1.061-1.061L6.939 8 3.646 4.707a.75.75 0 0 1 0-1.061z" />
-                                                </svg>
-                                            </button>
+                                                        @*Remove Cross button*@
+                                                        <button type="submit" style="vertical-align: 0" class="btn p-0 border-0 bg-transparent text-danger">
+                                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 16 16">
+                                                                <path fill="#9E2E2E" stroke="#9E2E2E" stroke-width="1.5" d="M3.646 3.646a.75.75 0 0 1 1.061 0L8 7.293l3.293-3.647a.75.75 0 0 1 1.061 1.061L9.061 8l3.293 3.646a.75.75 0 1 1-1.061 1.061L8 9.061l-3.293 3.647a.75.75 0 1 1-1.061-1.061L6.939 8 3.646 4.707a.75.75 0 0 1 0-1.061z" />
+                                                            </svg>
+                                                        </button>
+                                                    </div>
+                                                }
+                                            </div>
+
+                                            <div class="card-body d-flex">
+                                                <div class="setup-image me-3 bg-light">
+                                                    <img src="@(setup.SetupImage)" alt="Setup Image" class="img-fluid" style="width: auto; height: 160px;">
+                                                </div>
+                                                <div class="setup-details">
+                                                    <div class="mb-2">
+                                                        <strong>Jaw:</strong> @setup.Jaw.JawName
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Tooth Info:</strong> @setup.Toothinfo
+                                                    </div>
+                                                    <div class="mb-2">
+                                                        <strong>Material info:</strong>@setup.MaterialSize @setup.MeasurementUnit - @setup.MaterialShape 
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
 
-                                        <div class="card-body d-flex">
-                                            <div class="setup-image me-3 bg-light">
-                                                <img src="@(setup.SetupImage)" alt="Setup Image" class="img-fluid" style="width: auto; height: 160px;">
-                                            </div>
-                                            <div class="setup-details">
-                                                <div class="mb-2">
-                                                    <strong>Jaw:</strong> @setup.Jaw.JawName
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Tooth Info:</strong> @setup.Toothinfo
-                                                </div>
-                                                <div class="mb-2">
-                                                    <strong>Material Size:</strong> @setup.MaterialSize
-                                                </div>
-                                            </div>
-                                        </div>
                                     </div>
-                                
-                            </div>
-                            </form>
+                                </form>
+                            }
                         }
+                        
                     </div>
-                    <div class="text-center mb-2">
-                        <a class="btn btn-info" asp-action="Create" asp-controller="Setup" asp-route-id="@Model.WorkSetupId">Add Setup</a>
-                    </div>
+                    @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                    {
+                        <div class="text-center mb-2">
+                            <a class="btn btn-info" asp-action="Create" asp-controller="Setup" asp-route-id="@Model.WorkSetupId">Add Setup</a>
+                        </div>
+                    }
                     @if (!string.IsNullOrEmpty(Model.Note))
                     {
                         <div class="worksetup-note bg-transparent mb-2">
                             <textarea asp-for="Note" class="container-fluid" disabled></textarea>
                         </div>
                     }
-                    <div class="text-center">
-                        <a class="btn btn-warning" asp-action="Update" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Edit Work Setup</a>
-                        <a class="btn btn-danger" asp-action="Delete" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Delete Work Setup</a>
-                    </div>
+                    @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                    {
+                        <div class="text-center">
+                            <a class="btn btn-warning" asp-action="Update" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Edit Work Setup</a>
+                            <a class="btn btn-danger" asp-action="Delete" asp-controller="WorkSetup" asp-route-id="@Model.WorkSetupId">Delete Work Setup</a>
+                        </div>
+                    }
                     @if (ViewBag.Errors != null)
                     {
                         <div class="alert alert-danger mt-3">

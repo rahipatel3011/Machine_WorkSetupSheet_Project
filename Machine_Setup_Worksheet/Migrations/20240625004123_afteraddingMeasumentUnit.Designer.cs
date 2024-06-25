@@ -4,6 +4,7 @@ using Machine_Setup_Worksheet.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Machine_Setup_Worksheet.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240625004123_afteraddingMeasumentUnit")]
+    partial class afteraddingMeasumentUnit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -137,7 +140,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            JawId = new Guid("2fc7b698-a207-4f3a-975b-f4f1f3c74bf4"),
+                            JawId = new Guid("ccc2d7a1-edce-40a6-8291-ca5c03e16b99"),
                             JawName = "Hard Jaws"
                         });
                 });
@@ -159,7 +162,7 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.HasData(
                         new
                         {
-                            MachineId = new Guid("12796546-0d0c-42bc-828d-f4e77534a00d"),
+                            MachineId = new Guid("d6cbd46c-4d29-4ddc-b91d-30c08892092a"),
                             MachineName = "Hwacheon"
                         });
                 });
@@ -173,13 +176,11 @@ namespace Machine_Setup_Worksheet.Migrations
                     b.Property<Guid>("JawId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("MaterialShape")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<double>("MaterialSize")
                         .HasColumnType("float");
 
                     b.Property<string>("MeasurementUnit")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
                         .HasColumnType("nvarchar(max)")
                         .HasDefaultValue("inches");

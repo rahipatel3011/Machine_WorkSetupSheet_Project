@@ -21,8 +21,11 @@ namespace Machine_Setup_Worksheet.Models.DTOs
         public string SetupImage { get; set; }
 
         public string? ImageUrl { get; set; }
+        [Range(0.125,Double.MaxValue, ErrorMessage = "Min value should be {1}")]
         public double MaterialSize { get; set; }
 
+        public string MaterialShape { get; set; } = "Round";
+        public string MeasurementUnit { get; set; }
         public Guid WorkSetupId { get; set; }
 
         [ForeignKey("WorkSetupId")]

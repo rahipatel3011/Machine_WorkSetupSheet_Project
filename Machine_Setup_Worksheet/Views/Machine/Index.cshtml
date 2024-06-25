@@ -14,16 +14,20 @@
 
 <div class="w-75 mx-auto">
     <h1 class="my-4 text-center">Machine Management</h1>
-    <div class="d-flex justify-content-end mb-3">
-        <a class="btn btn-primary" id="createButton" href="/machines/create">Create Machine</a>
-        @* asp-action="Create" asp-controller="Jaws" *@
-    </div>
-
+    @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+    {
+        <div class="d-flex justify-content-end mb-3">
+            <a class="btn btn-primary" id="createButton" href="/machines/create">Create Machine</a>
+        </div>
+    }
     <table class="table table-bordered">
         <thead class="thead-dark">
             <tr>
                 <th scope="col" class="jaws-name">Machine Name</th>
-                <th scope="col" class="jaws-action">Actions</th>
+                @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                {
+                    <th scope="col" class="jaws-action">Actions</th>
+                }
             </tr>
         </thead>
         <tbody>
@@ -32,10 +36,13 @@
             {
                 <tr>
                     <td>@machine.MachineName</td>
-                    <td>
-                        <a class="btn btn-warning btn-sm me-2" href="/machines/edit/@machine.MachineId" id="updateButton">Edit</a>
-                        <a class="btn btn-danger btn-sm" href="/machines/delete/@machine.MachineId" id="deleteButton">Delete</a>
-                    </td>
+                    @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                    {
+                        <td>
+                            <a class="btn btn-warning btn-sm me-2" href="/machines/edit/@machine.MachineId" id="updateButton">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="/machines/delete/@machine.MachineId" id="deleteButton">Delete</a>
+                        </td>
+                    }
                 </tr>
             }
             <!-- Add more rows as needed -->

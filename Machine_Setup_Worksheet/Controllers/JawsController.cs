@@ -1,6 +1,8 @@
-﻿using Machine_Setup_Worksheet.Models;
+﻿using Machine_Setup_Worksheet.Attributes;
+using Machine_Setup_Worksheet.Models;
 using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
+using Machine_Setup_Worksheet.Utility;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -59,6 +61,8 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="jawsDTO">Data of the Jaw to create.</param>
         /// <returns>Returns a redirect to the Index action if creation is successful; otherwise, returns to the create form with errors.</returns>
         [HttpPost("create")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] JawsDTO jawsDTO)
         {
             ViewBag.Open = true;
@@ -80,6 +84,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="JawId">ID of the Jaw to edit.</param>
         /// <returns>Returns a view to edit the specified Jaw.</returns>
         [HttpGet("edit/{JawId}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> EditJaw([FromRoute] Guid? JawId)
         {
             if (JawId == null)
@@ -98,6 +103,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="JawId">ID of the Jaw to delete.</param>
         /// <returns>Returns a view with the delete confirmation dialog for the specified Jaw.</returns>
         [HttpGet("delete/{JawId}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? JawId)
         {
             if (JawId == null)
@@ -116,6 +122,8 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="JawId">ID of the Jaw to delete.</param>
         /// <returns>Returns a redirect to the Index action if deletion is successful; otherwise, returns to the Index with errors.</returns>
         [HttpPost("delete")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteJaw([FromForm] Guid JawId)
         {
             int affectedRow = await _jawService.DeleteJaw(JawId);

@@ -17,7 +17,7 @@
     <header class="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="#">Navbar</a>
+                <a class="navbar-brand" href="#">Hi-Tech</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
@@ -26,9 +26,23 @@
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" asp-action="Index" asp-controller="Home">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link" asp-action="Create" asp-controller="WorkSetup">Add Setup</a>
+                        
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Setups
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <li><a class="dropdown-item" asp-action="Index" asp-controller="WorkSetup">All Setups</a></li>
+                                @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
+                                {
+                                    <li><a class="dropdown-item" asp-action="Create" asp-controller="WorkSetup">Add Setup</a></li>
+                                }
+                            </ul>
                         </li>
+
+
+
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                                 Manage Content
@@ -36,8 +50,6 @@
                             <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <li><a class="dropdown-item" href="/jaws">Manage Jaws</a></li>
                                 <li><a class="dropdown-item" href="/machines">Manage Machines</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -48,6 +60,8 @@
                             <a asp-action="Register" asp-controller="Account" class="btn btn-outline-success mx-1" type="button">Register</a>
                         </div>
                     }else{
+
+                        <span class="navbar-text text-white me-2">@User.Identity.Name</span>
                     <form asp-action="Logout" asp-controller="Account" class="d-flex">
                         <button class="btn btn-outline-success mx-1" type="submit">Logout</button>
                     </form>

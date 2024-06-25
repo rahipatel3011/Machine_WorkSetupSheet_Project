@@ -18,6 +18,8 @@ namespace Machine_Setup_Worksheet.Models
 
         public string SetupImage { get; set; }
         public double MaterialSize { get; set; }
+        public string? MaterialShape { get; set; }
+        public string? MeasurementUnit { get; set; }
 
         public Guid WorkSetupId { get; set; }
 

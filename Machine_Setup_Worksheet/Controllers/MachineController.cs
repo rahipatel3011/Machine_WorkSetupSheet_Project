@@ -1,6 +1,8 @@
-﻿using Machine_Setup_Worksheet.Models.DTOs;
+﻿using Machine_Setup_Worksheet.Attributes;
+using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services;
 using Machine_Setup_Worksheet.Services.IServices;
+using Machine_Setup_Worksheet.Utility;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -58,6 +60,8 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="machineDTO">Data of the Machine to create.</param>
         /// <returns>Returns a redirect to the Index action if creation is successful; otherwise, returns to the create form with errors.</returns>
         [HttpPost("create")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([FromForm] MachineDTO machineDTO)
         {
             ViewBag.Open = true;
@@ -78,6 +82,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="MachineId">ID of the Machine to edit.</param>
         /// <returns>Returns a view to edit the specified Machine.</returns>
         [HttpGet("edit/{MachineId}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> EditMachine([FromRoute] Guid? MachineId)
         {
             if (MachineId == null)
@@ -96,6 +101,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="MachineId">ID of the Machine to delete.</param>
         /// <returns>Returns a view with the delete confirmation dialog for the specified Machine.</returns>
         [HttpGet("delete/{MachineId}")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         public async Task<IActionResult> DeleteJaw([FromRoute] Guid? MachineId)
         {
             if (MachineId == null)
@@ -114,6 +120,8 @@ namespace Machine_Setup_Worksheet.Controllers
         /// <param name="MachineId">ID of the Machine to delete.</param>
         /// <returns>Returns a redirect to the Index action if deletion is successful; otherwise, returns to the Index with errors.</returns>
         [HttpPost("delete")]
+        [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMachine([FromForm] Guid MachineId)
         {
             int affectedRow = await _machineService.DeleteMachine(MachineId);
