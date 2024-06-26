@@ -10,7 +10,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8">
             <div class="card shadow">
-                <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                <div class="card-header custom-card-header text-white d-flex justify-content-between align-items-center">
                     <h3 class="mb-0">@Model.CompanyName</h3>
                     <h3 class="mb-0">@Model.WorkSetupName</h3>
                     <h3 class="mb-0">@Model.WorkSetupCode</h3>
@@ -42,7 +42,7 @@
                                     <div class="col-md-12 mb-4">
                                         <div class="card shadow setup-card">
 
-                                            <div class="card-header bg-secondary text-white d-flex justify-content-between align-items-center">
+                                            <div class="card-header setup-header text-white d-flex justify-content-between align-items-center">
                                                 <h5 class="mb-0">Setup #@setup.SetupNumber</h5>
                                                 @if (User.IsInRole(Roles.MACHINIST.ToString()) || User.IsInRole(Roles.ADMIN.ToString()))
                                                 {

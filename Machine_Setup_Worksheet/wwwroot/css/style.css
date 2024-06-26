@@ -52,10 +52,14 @@ h1 {
     transition: box-shadow 0.3s ease-in-out;
 }
 
-.setup-card:hover {
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-}
+    .setup-card:hover {
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        transform: translateY(-3px)
+    }
 
+.setup-header {
+    background-color: #EABE6C;
+}
 
 .card-body .setup-details {
     flex: 1;
@@ -69,10 +73,13 @@ h1 {
     transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
-    .card:hover {
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 1); /* Darker and more noticeable shadow */
-        transform: translateY(-3px);
-    }
+    /*.cutstom-card:hover {
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 1);*/ /* Darker and more noticeable shadow */
+        /*transform: translateY(-3px);
+    }*/
+.custom-card-header {
+    background-color: #891652;
+}
 
 .card-body {
     padding: 15px;
