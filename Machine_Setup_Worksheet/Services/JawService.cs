@@ -11,10 +11,12 @@ namespace Machine_Setup_Worksheet.Services
     {
         private readonly IJawRepository _jawRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public JawService(IJawRepository jawRepository, IMapper mapper) { 
+        public JawService(IJawRepository jawRepository, IMapper mapper, ICacheService cacheService) { 
             _jawRepository = jawRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
         
@@ -28,10 +30,19 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
+                var cacheJaws = await _cacheService.Get<IEnumerable<JawsDTO>>("jaws");
+                if (cacheJaws != null && cacheJaws.Count() > 0)
+                {
+                    return cacheJaws;
+                }
                 IEnumerable<Jaw> allJaws = await _jawRepository.GetAll();
                 IEnumerable<JawsDTO> allJawsDTO = _mapper.Map<IEnumerable<JawsDTO>>(allJaws);
 
+                // adding data to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save("jaws", allJawsDTO, expirytime);
                 return allJawsDTO;
+
             }catch (Exception ex)
             {
                 throw new ServiceException("An Error occured while getting all jaws in service layer", ex);
@@ -53,8 +64,18 @@ namespace Machine_Setup_Worksheet.Services
             {
                 if (jawId != null)
                 {
+                    var cacheJaw = await _cacheService.Get<JawsDTO>($"jaw{jawId}");
+                    if (cacheJaw != null)
+                    {
+                        return cacheJaw;
+                    }
                     Jaw? jaw = await _jawRepository.GetById(jawId.Value);
-                    return _mapper.Map<JawsDTO>(jaw);
+                    JawsDTO jawDTO = _mapper.Map<JawsDTO>(jaw);
+
+                    // adding cache
+                    DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                    _cacheService.Save($"jaw{jawId}", jawDTO, expirytime);
+                    return jawDTO;
                 }
                 throw new ArgumentNullException(nameof(jawId), "Jaw id cannot be null");
             }
@@ -76,7 +97,16 @@ namespace Machine_Setup_Worksheet.Services
             {
                 Jaw jaw = _mapper.Map<Jaw>(jawsDTO);
                 Jaw createdJaw = await _jawRepository.Update(jaw);
-                return _mapper.Map<JawsDTO>(createdJaw);
+                JawsDTO createdJawsDTO = _mapper.Map<JawsDTO>(createdJaw);
+
+
+                // invalidate old cache
+                await _cacheService.Delete("jaws");
+
+                // add to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"jaw{createdJawsDTO.JawId}", createdJawsDTO, expirytime);
+                return createdJawsDTO;
             }
             catch (Exception ex)
             {
@@ -94,6 +124,11 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
+                await _cacheService.Delete($"jaw{jawId}"); // deleting cache
+
+                // invalidate old cache
+                await _cacheService.Delete("jaws");
+
                 return await _jawRepository.Delete(jawId);
             }
             catch (Exception ex)

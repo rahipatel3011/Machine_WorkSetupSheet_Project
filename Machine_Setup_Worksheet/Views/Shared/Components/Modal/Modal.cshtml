@@ -22,7 +22,7 @@
                 }
                 @if(Model is JawsDTO)
                 {
-                    <form action="/jaws/create" method="post" id="CreateForm">
+                    <form asp-action="Create" asp-controller="Jaws" method="post" id="CreateForm">
                         <div class="mb-3">
                             <label for="jawName" class="form-label">Jaw Name</label>
                             @if (ViewBag.jaw != null)
@@ -43,7 +43,7 @@
                 }
                 else if (Model is MachineDTO)
                 {
-                    <form action="/machines/create" method="post" id="CreateForm">
+                    <form asp-action="Create" asp-controller="Machine" method="post" id="CreateForm">
                         <div class="mb-3">
                             <label for="machineName" class="form-label">Machine Name</label>
                             @if (ViewBag.machine != null)

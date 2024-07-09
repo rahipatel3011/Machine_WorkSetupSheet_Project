@@ -119,7 +119,7 @@ namespace Machine_Setup_Worksheet.Controllers
         /// </summary>
         /// <param name="MachineId">ID of the Machine to delete.</param>
         /// <returns>Returns a redirect to the Index action if deletion is successful; otherwise, returns to the Index with errors.</returns>
-        [HttpPost("delete")]
+        [HttpPost("delete/{MachineId}")]
         [AuthorizeRoles(Roles.MACHINIST, Roles.ADMIN)]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteMachine([FromForm] Guid MachineId)

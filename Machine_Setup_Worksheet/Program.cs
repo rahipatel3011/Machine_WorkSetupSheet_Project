@@ -8,9 +8,19 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
+
+
+// Redis Configuration
+builder.Services.AddSingleton<IConnectionMultiplexer>(options =>
+{
+    string ReddisConnectionString = builder.Configuration.GetValue<string>("redis:ConnectionString")!;
+    return ConnectionMultiplexer.Connect(ReddisConnectionString);
+});
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
@@ -30,14 +40,18 @@ builder.Services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
     .AddDefaultTokenProviders()
     .AddUserStore<UserStore<ApplicationUser, ApplicationRole, ApplicationDbContext, Guid>>()
     .AddRoleStore<RoleStore<ApplicationRole,ApplicationDbContext,Guid>>();
+
+
+
 // DI for all repository
- builder.Services.AddScoped<IJawRepository, JawRepository>();
+builder.Services.AddScoped<IJawRepository, JawRepository>();
 builder.Services.AddScoped<IMachineRepository, MachineRepository>();
 builder.Services.AddScoped<IWorkSetupRepository, WorkSetupRepository>();
 builder.Services.AddScoped<ISetupRepository, SetupRepository>();
 
 
 // DI for all services
+builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddScoped<IJawService, JawService>();
 builder.Services.AddScoped<IMachineService, MachineService>();
 builder.Services.AddScoped<IWorkSetupService, WorkSetupService>();
@@ -62,10 +76,9 @@ builder.Services.AddAuthorization(options =>
 
 // AutoMapper
 builder.Services.AddAutoMapper(typeof(Program));
-
-
-
 var app = builder.Build();
+
+//ApplyMigration();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -75,10 +88,10 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    app.UseHsts();
+    //app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthentication();
@@ -87,4 +100,18 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+
+
+
+//void ApplyMigration()
+//{
+//    using (var scope = app.Services.CreateScope())
+//    {
+//        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+//        if (context != null)
+//        {
+//            context.Database.Migrate();
+//        }
+//    }
+//}
 

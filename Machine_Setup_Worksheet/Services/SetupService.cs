@@ -11,10 +11,12 @@ namespace Machine_Setup_Worksheet.Services
     {
         private readonly ISetupRepository _setupRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public SetupService(ISetupRepository setupRepository, IMapper mapper) {
+        public SetupService(ISetupRepository setupRepository, IMapper mapper, ICacheService cacheService) {
             _setupRepository = setupRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
 
@@ -29,7 +31,12 @@ namespace Machine_Setup_Worksheet.Services
             {
                 if(id !=  Guid.Empty)
                 {
-                   return  await _setupRepository.Delete(id);
+                    int numberOfDeletedSetups = await _setupRepository.Delete(id);
+                    // invalidate old cache
+                    await _cacheService.Delete("setups");
+                    await _cacheService.Delete($"setup{id}");
+
+                    return numberOfDeletedSetups;
                 }
                 return 0;
             }
@@ -50,8 +57,18 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
+                var cacheSetups = await _cacheService.Get<IEnumerable<SetupDTO>>("setups");
+                if (cacheSetups != null && cacheSetups.Count() > 0)
+                {
+                    return cacheSetups;
+                }
                 IEnumerable<Setup> setups = await _setupRepository.GetAllAsync(WorkSetupId);
                 IEnumerable<SetupDTO> setupsDTOs = _mapper.Map<IEnumerable<SetupDTO>>(setups);
+
+                // add cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save("setups", setupsDTOs, expirytime);
+
                 return setupsDTOs;
             }
             catch (Exception ex)
@@ -71,10 +88,21 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
+                var cacheSetup = await _cacheService.Get<SetupDTO>($"setup{id}");
+                if (cacheSetup != null)
+                {
+                    return cacheSetup;
+                }
                 Setup? setup = await _setupRepository.GetByIdAsync(id);
-                return _mapper.Map<SetupDTO>(setup);
-                
-            }catch(Exception ex)
+                SetupDTO setupDTO = _mapper.Map<SetupDTO>(setup);
+
+
+                // adding cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"setup{id}", setupDTO, expirytime);
+                return setupDTO;
+            }
+            catch(Exception ex)
             {
                 throw new ServiceException($"An Error occured while getting a setup in service layer with id:{id}", ex);
             }
@@ -93,7 +121,16 @@ namespace Machine_Setup_Worksheet.Services
             {
                 Setup setup = _mapper.Map<Setup>(setupDTO);
                 Setup savedSetup = await _setupRepository.Save(setup);
-                return _mapper.Map<SetupDTO>(savedSetup);
+                SetupDTO savedSetupDTO = _mapper.Map<SetupDTO>(savedSetup);
+
+
+                // invalidate old cache
+                await _cacheService.Delete("setups");
+
+                // add to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"setup{savedSetupDTO.SetupId}", savedSetupDTO, expirytime);
+                return savedSetupDTO;
             }
             catch (Exception ex)
             {

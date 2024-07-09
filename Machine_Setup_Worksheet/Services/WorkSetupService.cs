@@ -12,10 +12,12 @@ namespace Machine_Setup_Worksheet.Services
     {
         private readonly IWorkSetupRepository _workRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public WorkSetupService(IWorkSetupRepository workRepository, IMapper mapper) {
+        public WorkSetupService(IWorkSetupRepository workRepository, IMapper mapper, ICacheService cacheService) {
             _workRepository = workRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
 
@@ -30,7 +32,16 @@ namespace Machine_Setup_Worksheet.Services
             {
                 WorkSetup workSetup = _mapper.Map<WorkSetup>(workSetupDTO);
                 WorkSetup savedWorkSetup = await _workRepository.Save(workSetup);
-                return _mapper.Map<WorkSetupDTO>(savedWorkSetup);
+                WorkSetupDTO savedWorkSetupDTO = _mapper.Map<WorkSetupDTO>(savedWorkSetup);
+
+
+                // invalidate old cache
+                await _cacheService.Delete("worksetups");
+
+                // add to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"worksetup{savedWorkSetupDTO.WorkSetupId}", savedWorkSetupDTO, expirytime);
+                return savedWorkSetupDTO;
             }
             catch (Exception ex)
             {
@@ -51,6 +62,10 @@ namespace Machine_Setup_Worksheet.Services
             {
                 if (id != Guid.Empty)
                 {
+                    await _cacheService.Delete($"worksetup{id}"); // deleting cache
+
+                    // invalidate old cache
+                    await _cacheService.Delete("worksetups");
                     return await _workRepository.Delete(id);
                 }
                 return 0;
@@ -71,7 +86,18 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
-                return _mapper.Map<IEnumerable<WorkSetupDTO>>(await _workRepository.GetAllAsync());
+                var cacheWorkSetups = await _cacheService.Get<IEnumerable<WorkSetupDTO>>("worksetups");
+                if (cacheWorkSetups != null && cacheWorkSetups.Count() > 0)
+                {
+                    return cacheWorkSetups;
+                }
+
+                IEnumerable<WorkSetupDTO> allWorkSetupsDTO = _mapper.Map<IEnumerable<WorkSetupDTO>>(await _workRepository.GetAllAsync());
+
+                // adding data to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save("worksetups", allWorkSetupsDTO, expirytime);
+                return allWorkSetupsDTO;
             }
             catch (Exception ex)
             {
@@ -92,9 +118,18 @@ namespace Machine_Setup_Worksheet.Services
             {
                 if (id != Guid.Empty)
                 {
+                    var cacheWorkSetup = await _cacheService.Get<WorkSetupDTO>($"worksetup{id}");
+                    if (cacheWorkSetup != null)
+                    {
+                        return cacheWorkSetup;
+                    }
                     WorkSetup workSetup = await _workRepository.GetByIdAsync(id);
                     workSetup.Setups = workSetup.Setups.OrderBy(s => s.SetupNumber).ToList();
-                    return _mapper.Map<WorkSetupDTO>(workSetup);
+                    WorkSetupDTO workSetupDTO = _mapper.Map<WorkSetupDTO>(workSetup);
+                    // adding cache
+                    DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                    _cacheService.Save($"worksetup{id}", workSetupDTO, expirytime);
+                    return workSetupDTO;
                 }
                 else
                 {
@@ -120,9 +155,29 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
-                IEnumerable<WorkSetup> allWorkSetups = await _workRepository.GetAllAsync();
-                IEnumerable<WorkSetupDTO> allWorkSetupsDTOs = _mapper.Map< IEnumerable < WorkSetupDTO >>(allWorkSetups);
-                return allWorkSetupsDTOs.Where(ws=> ContainsKeyword(ws,searchTerm)).ToList();
+                var cacheWorkSetups = await _cacheService.Get<IEnumerable<WorkSetupDTO>>($"worksetups{searchTerm}");
+                if (cacheWorkSetups != null && cacheWorkSetups.Count() > 0)
+                {
+                    return cacheWorkSetups;
+                }
+                // check allworksetups cached or not, if not then get all worksetups and caching it
+                IEnumerable<WorkSetupDTO> allWorkSetupsDTOs = await _cacheService.Get<IEnumerable<WorkSetupDTO>>("worksetups");
+                if(allWorkSetupsDTOs == null)
+                {
+                    IEnumerable<WorkSetup> allWorkSetups = await _workRepository.GetAllAsync();
+                    allWorkSetupsDTOs = _mapper.Map<IEnumerable<WorkSetupDTO>>(allWorkSetups);
+
+                    DateTimeOffset expirytime1 = DateTimeOffset.Now.AddMinutes(5);
+                    _cacheService.Save("worksetups", allWorkSetupsDTOs, expirytime1);
+                }
+                
+                
+                List<WorkSetupDTO> matchedWorkSetupDTOs = allWorkSetupsDTOs.Where(ws => ContainsKeyword(ws, searchTerm)).ToList();
+
+                // adding data to cache for specific search term
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"worksetups{searchTerm}", matchedWorkSetupDTOs, expirytime);
+                return matchedWorkSetupDTOs;
             }
             catch (Exception ex)
             {

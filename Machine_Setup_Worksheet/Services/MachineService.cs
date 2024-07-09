@@ -12,13 +12,16 @@ namespace Machine_Setup_Worksheet.Services
     {
         private readonly IMachineRepository _machineRepository;
         private readonly IMapper _mapper;
+        private readonly ICacheService _cacheService;
 
-        public MachineService(IMachineRepository machineRepository, IMapper mapper) {
+        public MachineService(IMachineRepository machineRepository, IMapper mapper, ICacheService cacheService)
+        {
             _machineRepository = machineRepository;
             _mapper = mapper;
+            _cacheService = cacheService;
         }
 
-        
+
 
 
         /// <summary>
@@ -29,8 +32,18 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
+                var cacheMachines = await _cacheService.Get<IEnumerable<MachineDTO>>("machines");
+                if (cacheMachines != null && cacheMachines.Count() > 0)
+                {
+                    return cacheMachines;
+                }
                 IEnumerable<Machine> allMachines = await _machineRepository.GetAll();
                 IEnumerable<MachineDTO> allMachinesDTO = _mapper.Map<IEnumerable<MachineDTO>>(allMachines);
+
+
+                // adding data to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save("machines", allMachinesDTO, expirytime);
 
                 return allMachinesDTO;
             }
@@ -55,10 +68,19 @@ namespace Machine_Setup_Worksheet.Services
             {
                 if (machineId != null)
                 {
+                    var cacheMachine = await _cacheService.Get<MachineDTO>($"machine{machineId}");
+                    if (cacheMachine != null)
+                    {
+                        return cacheMachine;
+                    }
                     Machine? machine = await _machineRepository.GetById(machineId.Value);
                     if (machine != null)
                     {
-                        return _mapper.Map<MachineDTO>(machine);
+                        MachineDTO foundMachineDTO = _mapper.Map<MachineDTO>(machine);
+                        // adding cache
+                        DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                        _cacheService.Save($"machine{machineId}", foundMachineDTO, expirytime);
+                        return foundMachineDTO;
                     }
                 }
 
@@ -82,7 +104,17 @@ namespace Machine_Setup_Worksheet.Services
             {
                 Machine machine = _mapper.Map<Machine>(machineDTO);
                 Machine createdMachine = await _machineRepository.Update(machine);
-                return _mapper.Map<MachineDTO>(createdMachine);
+                MachineDTO createdMachineDTO = _mapper.Map<MachineDTO>(createdMachine);
+
+
+                // invalidate old cache
+                await _cacheService.Delete("machines");
+
+                // add to cache
+                DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);
+                _cacheService.Save($"jaw{createdMachineDTO.MachineId}", createdMachineDTO, expirytime);
+
+                return createdMachineDTO;
             }
             catch (Exception ex)
             {
@@ -101,7 +133,13 @@ namespace Machine_Setup_Worksheet.Services
         {
             try
             {
-                return await _machineRepository.Delete(machineId);
+                int numberOfDeletedMachines = await _machineRepository.Delete(machineId);
+
+                // invalidate old cache
+                await _cacheService.Delete("machines");
+
+                await _cacheService.Delete($"jaw{machineId}"); // deleting cache
+                return numberOfDeletedMachines;
             }
             catch (Exception ex)
             {
