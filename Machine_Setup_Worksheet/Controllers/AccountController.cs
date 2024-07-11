@@ -19,14 +19,16 @@ namespace Machine_Setup_Worksheet.Controllers
     public class AccountController : Controller
     {
         private readonly IUserService _userService;
+        private readonly ILogger<AccountController> _logger;
 
         /// <summary>
         /// Constructor to initialize the AccountController with IUserService dependency.
         /// </summary>
         /// <param name="userService">Instance of IUserService for user operations.</param>
-        public AccountController(IUserService userService)
+        public AccountController(IUserService userService, ILogger<AccountController> logger)
         {
             _userService = userService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -38,6 +40,7 @@ namespace Machine_Setup_Worksheet.Controllers
         [AllowAnonymous]
         public IActionResult Register()
         {
+            _logger.LogWarning("Inside Register Controller");
             if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");
@@ -83,6 +86,7 @@ namespace Machine_Setup_Worksheet.Controllers
         [AllowAnonymous]
         public IActionResult Login()
         {
+            _logger.LogWarning("Inside Login Controller");
             if (User.Identity.IsAuthenticated)
             {
                 return RedirectToAction(nameof(HomeController.Index), "Home");

@@ -4,7 +4,7 @@ using Machine_Setup_Worksheet.Models.DTOs;
 using Machine_Setup_Worksheet.Services.IServices;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json.Linq;
+using System.Security.Claims;
 
 namespace Machine_Setup_Worksheet.Services
 {
@@ -40,7 +40,7 @@ namespace Machine_Setup_Worksheet.Services
                 {
                     Name = registerDTO.Name,
                     Email = registerDTO.Email,
-                    UserName = registerDTO.Email.Split("@")[0],
+                    UserName = registerDTO.Email,
                 };
 
                 IdentityResult identityResult = await _userManager.CreateAsync(user, registerDTO.Password);
@@ -69,6 +69,7 @@ namespace Machine_Setup_Worksheet.Services
                     bool isCreadentialTrue = await _userManager.CheckPasswordAsync(applicationUser, loginDTO.Password);
                     if (isCreadentialTrue)
                     {
+                        await _userManager.AddClaimAsync(applicationUser, new Claim(ClaimTypes.GivenName, applicationUser.Name));
                         await _signInManager.SignInAsync(applicationUser, false);
                         return true;
                     }

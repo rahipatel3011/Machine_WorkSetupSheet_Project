@@ -62,7 +62,7 @@
                         </div>
                     }else{
 
-                        <span class="navbar-text text-white me-2">@User.Identity.Name</span>
+                        <span class="navbar-text text-white me-2">@User.FindFirst(ClaimTypes.GivenName).Value</span>
                     <form asp-action="Logout" asp-controller="Account" class="d-flex">
                         <button class="btn btn-outline-success mx-1" type="submit">Logout</button>
                     </form>

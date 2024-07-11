@@ -11,14 +11,16 @@ namespace Machine_Setup_Worksheet.Controllers
     public class HomeController : Controller
     {
         private readonly IWorkSetupService _workSetupService;
+        private readonly ILogger<HomeController> _logger;
 
         /// <summary>
         /// Constructor to initialize HomeController with dependencies.
         /// </summary>
         /// <param name="workSetupService">Service for WorkSetup-related operations.</param>
-        public HomeController(IWorkSetupService workSetupService)
+        public HomeController(IWorkSetupService workSetupService, ILogger<HomeController> logger)
         {
             _workSetupService = workSetupService;
+            _logger = logger;
         }
 
         /// <summary>
@@ -29,6 +31,7 @@ namespace Machine_Setup_Worksheet.Controllers
         [HttpGet("/")]
         public IActionResult Index()
         {
+            _logger.LogWarning("Inside Home Controller");
             return View();
         }
 

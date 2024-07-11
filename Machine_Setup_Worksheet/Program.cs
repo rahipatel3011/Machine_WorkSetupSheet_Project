@@ -5,14 +5,20 @@ using Machine_Setup_Worksheet.Repositories.IRepository;
 using Machine_Setup_Worksheet.Services;
 using Machine_Setup_Worksheet.Services.IServices;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Logging.AddConsole();
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddDataProtection()
+    .PersistKeysToFileSystem(new DirectoryInfo(Path.Combine(Directory.GetCurrentDirectory(), "DataProtection-Keys"))).SetApplicationName("MyApp");
 
 // Redis Configuration
 builder.Services.AddSingleton<IConnectionMultiplexer>(options =>
@@ -20,6 +26,8 @@ builder.Services.AddSingleton<IConnectionMultiplexer>(options =>
     string ReddisConnectionString = builder.Configuration.GetValue<string>("redis:ConnectionString")!;
     return ConnectionMultiplexer.Connect(ReddisConnectionString);
 });
+
+
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
@@ -78,7 +86,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services.AddAutoMapper(typeof(Program));
 var app = builder.Build();
 
-//ApplyMigration();
+ApplyMigration();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -88,10 +96,8 @@ if (app.Environment.IsDevelopment())
 else
 {
     app.UseExceptionHandler("/Error");
-    //app.UseHsts();
 }
 
-//app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthentication();
@@ -103,15 +109,15 @@ app.Run();
 
 
 
-//void ApplyMigration()
-//{
-//    using (var scope = app.Services.CreateScope())
-//    {
-//        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-//        if (context != null)
-//        {
-//            context.Database.Migrate();
-//        }
-//    }
-//}
+void ApplyMigration()
+{
+    using (var scope = app.Services.CreateScope())
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        if (context != null)
+        {
+            context.Database.Migrate();
+        }
+    }
+}
 
