@@ -45,6 +45,12 @@ namespace Machine_Setup_Worksheet.Repositories
             {
                 _db.WorkSetups.Update(workSetup);
                 await _db.SaveChangesAsync();
+                // loading up all binded properties to cache all property
+                workSetup = await _db.WorkSetups
+                            .Include(w => w.machine)
+                            .Include(w => w.Setups)
+                                .ThenInclude(w=> w.Jaw)
+                            .FirstOrDefaultAsync(w => w.WorkSetupId == workSetup.WorkSetupId);
                 return workSetup;
             }
             catch (Exception ex)

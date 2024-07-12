@@ -63,6 +63,7 @@ namespace Machine_Setup_Worksheet.Repositories
             {
                 _db.Setups.Update(setup);
                 await _db.SaveChangesAsync();
+                await _db.Entry(setup).Reference(u=>u.Jaw).LoadAsync();
                 return setup;
             }
             catch (Exception ex)

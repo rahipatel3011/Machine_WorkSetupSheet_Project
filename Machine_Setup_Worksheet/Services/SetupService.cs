@@ -25,7 +25,7 @@ namespace Machine_Setup_Worksheet.Services
         /// </summary>
         /// <param name="id">SetupId</param>
         /// <returns>number of affected recored</returns>
-        public async Task<int> DeleteSetup(Guid id)
+        public async Task<int> DeleteSetup(Guid id, Guid workSetupId)
         {
             try
             {
@@ -35,6 +35,8 @@ namespace Machine_Setup_Worksheet.Services
                     // invalidate old cache
                     await _cacheService.Delete("setups");
                     await _cacheService.Delete($"setup{id}");
+
+                    await _cacheService.Delete($"worksetup{workSetupId}");
 
                     return numberOfDeletedSetups;
                 }
@@ -126,6 +128,7 @@ namespace Machine_Setup_Worksheet.Services
 
                 // invalidate old cache
                 await _cacheService.Delete("setups");
+                await _cacheService.Delete($"worksetup{setupDTO.WorkSetupId}");
 
                 // add to cache
                 DateTimeOffset expirytime = DateTimeOffset.Now.AddMinutes(5);

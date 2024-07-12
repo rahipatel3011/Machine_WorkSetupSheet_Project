@@ -189,7 +189,7 @@ namespace Machine_Setup_Worksheet.Controllers
             SetupDTO dbSetupDTO = await _setupService.GetBySetupIdAsync(setupId);
             string imageFullPath = Path.Combine(_webHostEnvironment.WebRootPath, dbSetupDTO.SetupImage.TrimStart('/'));
 
-            int affectedRows = await _setupService.DeleteSetup(setupId);
+            int affectedRows = await _setupService.DeleteSetup(setupId,dbSetupDTO.WorkSetupId);
 
             if (affectedRows <= 0)
             {

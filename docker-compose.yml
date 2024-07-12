@@ -6,6 +6,8 @@ services:
     container_name: redis_container
     ports:
       - "6379:6379"
+    volumes:
+      - redisdata:/data
 
   machine_setup_db:
     image: mcr.microsoft.com/mssql/server:latest
@@ -15,6 +17,8 @@ services:
       - SA_PASSWORD=Rahipatel@1994
     ports:
       - "1433:1433"
+    volumes:
+      - sqlserverdata:/var/opt/mssql
 
   machine_setup:
     container_name: my_app
@@ -30,6 +34,11 @@ services:
       - ./Machine_Setup_worksheet/DataProtection-Keys:/app/DataProtection-Keys
     environment:
       - ConnectionStrings__DefaultConnection=Server=machine_setup_db;Database=MachineSetup;User ID=sa;Password=Rahipatel@1994;TrustServerCertificate=true;
+
+volumes:
+  dataprotection-keys:
+  sqlserverdata:
+  redisdata:
 
   
   

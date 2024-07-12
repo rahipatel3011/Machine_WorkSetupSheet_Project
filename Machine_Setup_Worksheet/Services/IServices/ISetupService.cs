@@ -34,6 +34,6 @@ namespace Machine_Setup_Worksheet.Services.IServices
         /// </summary>
         /// <param name="id">SetupId</param>
         /// <returns>number of affected recored</returns>
-        Task<int> DeleteSetup(Guid id);
+        Task<int> DeleteSetup(Guid id, Guid workSetupId);
     }
 }
