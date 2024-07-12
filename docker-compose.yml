@@ -22,9 +22,7 @@ services:
 
   machine_setup:
     container_name: my_app
-    build:
-      context: ./Machine_Setup_worksheet
-      dockerfile: Dockerfile
+    image: rahiblogger/machine_setup_app:v1
     ports:
       - "8080:8080"
     depends_on:
