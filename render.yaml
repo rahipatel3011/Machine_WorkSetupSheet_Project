@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: machine-setup-app
+    env: docker
+    image: rahiblogger/machine_setup_app:v1
+    ports:
+      - port: 8080
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        value: Server=machine_setup_db,1433;Database=MachineSetup;User ID=sa;Password=Rahipatel@1994;TrustServerCertificate=true;
+    volumes:
+      - name: dataprotection-keys
+        path: /app/DataProtection-Keys
+      - name: webdata
+        path: /data/images
+    depends_on:
+      - machine-setup-db
+      - redis
+
+  - type: web
+    name: machine-setup-db
+    env: docker
+    image: mcr.microsoft.com/mssql/server:latest
+    ports:
+      - port: 1433
+    envVars:
+      - key: ACCEPT_EULA
+        value: Y
+      - key: SA_PASSWORD
+        value: Rahipatel@1994
+
+  - type: redis
+    name: redis
+    env: docker
+    image: redis:latest
+    ports:
+      - port: 6379
+
+volumes:
+  dataprotection-keys:
+    path: ./Machine_Setup_worksheet/DataProtection-Keys
+  webdata:
+    path: ./Machine_Setup_worksheet/wwwroot/images
