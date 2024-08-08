@@ -21,10 +21,15 @@ services:
       - sqlserverdata:/var/opt/mssql
 
   machine_setup:
+<<<<<<< HEAD
     container_name: worksetup_app
     build:
       context: ./Machine_Setup_worksheet
       dockerfile: Dockerfile
+=======
+    container_name: my_app
+    image: rahiblogger/machine_setup_app:v1
+>>>>>>> 9e5e546fd2a098def85a9ce66eb98aa5648c2358
     ports:
       - "8080:8080"
     depends_on:
