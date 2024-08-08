@@ -15,6 +15,7 @@ services:
       name: webdata
       mountPath: /data
       sizeGB: 10
+    port: 8080:8080
 
   - type: pserv
     name: sql_server_container
@@ -30,6 +31,7 @@ services:
         value: "Y"
       - key: SA_PASSWORD
         value: Rahipatel@1994
+    port: 1433:1433
 
   - type: pserv
     name: redis_container
@@ -40,3 +42,4 @@ services:
       name: redisdata
       mountPath: /data
       sizeGB: 1
+    port: 6379:6379
