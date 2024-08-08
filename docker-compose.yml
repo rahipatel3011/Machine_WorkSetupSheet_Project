@@ -1,4 +1,4 @@
-version: '3.4'
+version: '3.8'
 
 services:
   redis:
@@ -7,7 +7,7 @@ services:
     ports:
       - "6379:6379"
     volumes:
-      - redisdata:/data
+      - redisdata:/data/redis
 
   machine_setup_db:
     image: mcr.microsoft.com/mssql/server:latest
@@ -21,7 +21,7 @@ services:
       - sqlserverdata:/var/opt/mssql
 
   machine_setup:
-    container_name: my_app
+    container_name: worksetup_app
     build:
       context: ./Machine_Setup_worksheet
       dockerfile: Dockerfile
@@ -32,13 +32,17 @@ services:
       - redis
     volumes:
       - ./Machine_Setup_worksheet/DataProtection-Keys:/app/DataProtection-Keys
+      - ./Machine_Setup_worksheet/wwwroot/images:/data/images
+      - webdata:/data/images  # Associate webdata volume with machine_setup service
+      - dataprotection-keys:/app/DataProtection-Keys
     environment:
-      - ConnectionStrings__DefaultConnection=Server=machine_setup_db;Database=MachineSetup;User ID=sa;Password=Rahipatel@1994;TrustServerCertificate=true;
+      - ConnectionStrings__DefaultConnection=Server=machine_setup_db,1433;Database=MachineSetup;User ID=sa;Password=Rahipatel@1994;TrustServerCertificate=true;
 
 volumes:
-  dataprotection-keys:
   sqlserverdata:
   redisdata:
+  dataprotection-keys:
+  webdata:
 
   
   

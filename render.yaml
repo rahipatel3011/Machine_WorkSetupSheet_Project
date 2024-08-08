@@ -1,0 +1,42 @@
+services:
+  - type: web
+    name: worksetup-app
+    env: docker
+    dockerfilePath: ./Machine_Setup_worksheet/Dockerfile
+    dockerContext: ./Machine_Setup_worksheet
+    plan: starter
+    branch: main
+    numInstances: 1
+    healthCheckPath: /
+    envVars:
+      - key: ConnectionStrings__DefaultConnection
+        value: "Server=sql_server_container,1433;Database=MachineSetup;User ID=sa;Password=Rahipatel@1994;TrustServerCertificate=true;"
+    disk:
+      name: webdata
+      mountPath: /data
+      sizeGB: 10
+
+  - type: pserv
+    name: sql_server_container
+    env: docker
+    image: mcr.microsoft.com/mssql/server:latest
+    plan: standard
+    disk:
+      name: sqlserverdata
+      mountPath: /var/opt/mssql
+      sizeGB: 10
+    envVars:
+      - key: ACCEPT_EULA
+        value: "Y"
+      - key: SA_PASSWORD
+        value: Rahipatel@1994
+
+  - type: pserv
+    name: redis_container
+    env: docker
+    image: redis:latest
+    plan: starter
+    disk:
+      name: redisdata
+      mountPath: /data
+      sizeGB: 1
